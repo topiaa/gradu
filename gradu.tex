@@ -1,0 +1,1802 @@
+\documentclass[12pt,a4paper,leqno]{report}
+
+\usepackage[ansinew]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[finnish]{babel}
+\usepackage{amsthm}
+\usepackage{amsfonts}         
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{enumerate}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\No}{\mathbb{N}_0}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\diam}{\operatorname{diam}}
+\newcommand{\indept}{\perp\!\!\!\perp}
+\newcommand{\argmin}{\operatornamewithlimits{argmin}}
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+
+\theoremstyle{plain}
+\newtheorem{lause}[equation]{Lause}
+\newtheorem{lem}[equation]{Lemma}
+\newtheorem{prop}[equation]{Propositio}
+\newtheorem{kor}[equation]{Korollaari}
+
+\theoremstyle{definition}
+\newtheorem{maar}[equation]{Määritelmä}
+\newtheorem{konj}[equation]{Konjektuuri}
+\newtheorem{esim}[equation]{Esimerkki}
+
+\theoremstyle{remark}
+\newtheorem{huom}[equation]{Huomautus}
+
+\pagestyle{plain}
+\setcounter{page}{1}
+\addtolength{\hoffset}{-1.15cm}
+
+\addtolength{\textwidth}{2.3cm}
+\addtolength{\voffset}{0.45cm}
+\addtolength{\textheight}{-0.9cm}
+
+\title{Takaperäiset stokastiset differentiaaliyhtälöt, niiden rahoitusteoreettisia sovelluskohteita ja johdatus Itô-analyysiin}
+\author{Topias Tolonen}
+\date{\parbox{\linewidth}{\centering%
+  \today\endgraf\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip
+  Pro gradu -tutkielma\endgraf\medskip
+  Matematiikan ja tilastotieteen laitos \endgraf
+  Ohjaaja: Dario Gasbarra \endgraf\bigskip
+  Helsingin yliopisto}}
+\begin{document}
+
+\maketitle
+
+\tableofcontents{}
+
+\chapter{Johdanto}
+
+Todennäköisyyslaskenta on perinteisesti ollut matemaatikkojen ja kuninkaiden mielissä aina siitä lähtien kun noppapeleistä on lyöty vetoa rahaa vastaan. Tällaisissa tilanteissa rationaaliset ihmiset ohjeistavat matemaatikkoa  laskemaan parhaan vedonlyöntistrategian tietyille peleille. Antiikin tilanne noppapelien odotusarvoisissa voitoissa ja nykymaailman tilanne niin uhkapelien kuin rahoituksen saralla ei ole kovin erilainen: haluamme yhä nykypäivänä mallintaa satunnaisuutta pelaajien, sijoittajien tai tieteen hyödyksi. 
+Todennäköisyyslaskenta alana on verrattain nuori \cite{Anders1}\cite{Anders2}: 1700-luvulla Bernoulli (1654-1705) pystyi laskemaan satoja monimutkaisia todennäköisyyksiä ja mallintamaan suurten lukujen lain. 1800-luvulla taas Gauss (1777-1855) ja Laplace (1749-1827) edistivät tilastotiedettä valtavin harppauksen: normaalijakauma mallinnettiin, pienimmän neliösumman metodi löydettiin, momenttigeneroiva funktio luotiin ja hypoteesien testausta alettiin tarkentaa. Kuitenkin vasta 1900-luvulla tilastotieteen ja todennäköisyyslaskennan yhteys alkoi paljastua tiedemaailmalle, kun Kolmogorov (1903-1987) vuonna 1933 julkaisi artikkelinsa todennäköisyyden aksioomista. Nämä aksioomat loivat perustan matemaattisesti eheille todennäköisyysavaruuksille, ja vuosisata oli valmis: Markovin ketjujen teoria, Brownin liikkeen mallintaminen ja  tiedeyhteisön tulinen debatti bayesiläisen ja frekventistisen todennäköisyystulkinnan välillä muutti todennäköisyyslaskennan ikuisiksi ajoiksi. 
+
+Tutkielman kannalta oleellisin historia päiväytyy vuodelle 1905, kun nuori Albert Einstein julkaisi satunnaisuutta koskevan artikkelin Annalen der Physik -lehteen. Artikkelissa esiintyi aikainen vaihe stokastisten differentiaaliyhtälöiden teoriaan. Vauhtiin stokastisten prosessien ja stokastisten differentiaaliyhtälöiden tutkimus pääsi vuosina 1938-1945, kun Kiyosi Itô (1915-2008) julkaisi kaksi seminaarityötä liittyen todennäköisyyslaskentaan ja stokastisiin prosesseihin. Työt liittyivät Karl Weierstrassin (1815-1897) \emph{Weierstrassin funktioon} siten, että Weierstrassin funktiota --  joka oli kaikkialla jatkuva mutta ei missään derivoituva -- pidettiin 1800-luvulla vain ja ainoastaan matemaattisena kuriositeettina. Kuitenkin Itôn aikaan tiedeyhteisö alkoi ymmärtää, että tällaisilla funktioilla on sovelluksia rahoitusteoriassa ja osakehintojen mallintamisessa. Näin syntyi tarve niin kutsutulle Itô-analyysille, joka käsittelee ei-derivoituvien ja jatkuvien funktioiden analyysiä. 
+
+Tutkielman aihe, takaperäiset stokastiset differentiaaliyhtälöt, on myös todennäköisyyslaskennan viitekehyksessä uusi ala. Vuonna 1973 Jean-Michel Bismut (1948-) esitteli ensimmäisenä alkuperäisen takaperäisen stokastisen differentiaaliyhtälön. Tämän jälkeen vuonna 1990 Etienne Pardoux (1947-) ja Peng Shige (1947-) todistivat yleisen takaperäisen stokastisen differentiaaliyhtälön ratkaisun olemassaolon. Tämän jälkeen takaperäisten stokastisen yhtälöiden teoriaa on yhdistetty muun muassa osittaisdifferentiaaliyhtälöihin ja jälleen kerran etuperäisiin stokastisiin differentiaaliyhtälöihin.
+
+Toisessa luvussa määrittelemme yleisen todennäköisyysavaruuden $(\Omega,\mathcal{F},P)$, ja alamme rakentamaan todennäköisyyslaskennallista maailmaa tämän pohjalta. Luvun aikana luomme pala palalta tarpeen erilaisille todennäköisyyslaskennan käsitteille, määrittelemme Lebesguen integraalin ja odotusarvon ja  tarkastelemme satunnaismuuttujajonojen raja-arvoja. Siirrymme nopeasti stokastisten prosessien käsittelyssä tarvittaviin työkaluihin, kuten martingaaleihin ja filtraatioihin. Lopuksi siirrymme käsittelemään Brownin liikettä $B_t$, jonka määrittelemme kolmella eri tavalla. 
+
+Kolmannessa luvussa esittelemme Itôn integraalin 
+\begin{equation*}
+\int_S^T f dB_s,
+\end{equation*}
+perustelemme sen tarpeen ja esittelemme neliöheilahtelun käsitteen yhdessä Itôn lemman kanssa. Näiden jälkeen siirrymme luontevasti kohti moniulotteista Itô-integraalia, kunnes lopulta perustelemme integraalin määritelmän yleisille integrandeille. Luvun lopussa alamme käsittelemään stokastisia differentiaaliyhtälöitä diffuusioprosessien lähtökohdista eli yhtälöstä
+\begin{equation*}
+dX_t = b_t(X_t)dt + \sigma_t(X_t)dB_t.
+\end{equation*}
+Yhtälön esittelyn jälkeen pääsemme stokastisten differentiaaliyhtälöiden tärkeiden tuloksien -- olemassaolo- ja yksikäsitteisyyslauseiden -- piiriin. Ratkaisun olemassaolon todistamisen jälkeen käymme läpi ominaisuuksia näille yhtälöille, ennen kuin siirrymme kohti takaperäisiä yhtälöitä.
+
+Takaperäiset stokastiset differentiaaliyhtälöt (lyhennetään TSDY) astuvat kuvaan luvussa neljä. Tarkastelemme luvussa yhtälöä
+\begin{equation*}
+\begin{cases} dY_t = -f_t(Y_t,Z_t)dt + Z_tdB_t, \\
+Y_T = \xi,
+\end{cases}
+\end{equation*}
+missä $f$ on yhtälön generaattori ja $\xi$ niin kutsuttu terminaaliarvo. Tarkastelemme ongelman mielekkyyttä ja perustelemme yhtälöiden tarvetta. Nopeasti siirrymme tarkastelemaan, miten generaattorin muoto vaikuttaa yhtälöön ja sen ratkaisuihin. Tämän jälkeen esittelemme Pardoux'n ja Pengin kuuluisan tuloksen näiden yhtälöiden ratkaisun olemassaolosta ja yksikäsitteisyydestä \cite{PardouxPeng}. Olemassaolo- ja yksikäsitteisyyslauseen jälkeen esittelemme takaperäisten stokastisten differentiaaliyhtälöiden vertailulauseen, ja lopulla tarkastelemme yhtälöiden ratkaisuja löyhemmillä oletuksilla.
+
+Viimeisessä luvussa siirrymme tarkastelemaan erästä takaperäisten stokastisten differentiaaliyhtälöiden tärkeintä sovelluskohdetta: rahoitusteoriaa. Esittelemme klassisen rahoitusteorian Black ja Scholes -markkinamallin ja avaamme tämän maailman stokastisten differentiaaliyhtälöiden silmin. Todistamme tuloksen, missä yhdistetään eurooppalaisen option arvo takaperäisen stokastisen differentiaaliyhtälön ratkaisuihin ja mallinnamme hintatiheysprosessin $\Gamma$. Lopuksi osoitamme, että tällaisen eurooppalaisen option arvo tulee takaperäisten stokastisten differentiaaliyhtälöiden avulla täsmällisesti samaan hintaan kuin Black ja Scholes -artikkelissa \cite{BlackScholes} osoitettiin.
+
+
+\chapter{Todennäköisyysavaruuden konstruoinnista Brownin liikkeeseen}
+
+\section{Todennäköisyysavaruuden määrittely}
+
+Aloitamme \emph{todennäköisyysavaruuden} käsitteestä, sillä mielestämme jokainen todennäköisyys-käsitteen ympärillä pyörivä kirjallinen kokonaisuus tarvitsee raameiksi todennäköisyysavaruuden ja johdattelun satunnaisuuden matemaattiseen mallintamiseen.
+
+Joissain lähteissä rakennetaan tarve \emph{neliöheilahtelulle} (engl. Quadratic Variation, QV) ja \emph{Itô:n kaavalle} deterministisestä näkökulmasta \cite{Sondermann}. Näissä lähteissä tarve modernille stokastiselle analyysille perustellaan suoraan \emph{Brownin liikkeen} (engl. Brownian Motion, BM) polkuanalyysistä. Tässä analyysissä huomataan nopeasti, että Brownin liikkeen muodostama polku ei ole missään määrittelyalueellaan integroituva niin sanotun klassisen analyysin mielessä \cite{Ito}. Tämä synnyttää tarpeen neliöheilahtelun käsitteelle. 
+
+Kuitenkin tässä tutkielmassa lähdemme perinteisesti liikkeelle \emph{todennäköisyysavaruuden} rakentamisesta ja \emph{satunnaismuuttujien} yleisten ominaisuuksien esittelyssä. Oletamme, että esimerkiksi Durrettin kirja \cite{Durrett} on lukijalle tuttu todennäköisyysteoreettisena esitietokokoelmana, mutta eheän kokonaisuuden saamiseksi muodostamme lyhyen ja kattavan esittelyn satunnaisilmiöiden mallinnuksesta. Satunnaisilmiöiden mallinnuksen aloitamme tässä tutkielmassa $\sigma$-algebran käsitteellä, ja jatkamme siitä kohti yleisiä todennäköisyysavaruuksia:
+
+\begin{maar}
+Olkoon $\Omega$ epätyhjä joukko. Tällöin joukon $\Omega$ \emph{sigma-algebra} $\mathcal{F}$ on kokoelma $\Omega$:n osajoukkoja, jolle pätee
+\begin{enumerate}
+\item $\emptyset\in\mathcal{F}$
+\item jos $A\in\mathcal{F}$, niin $A^C = \Omega\backslash A\in\mathcal{F}$
+\item jos $A_i\in\mathcal{F}$ kaikilla $i\in\N$, niin $\bigcup _{i\in\N}A_{i}\in {\mathcal {F}}$, missä $\N$ on numeroituva joukko.
+\end{enumerate}
+\end{maar}
+
+Sigma-algebran käsite vaaditaan matemaattisesti eheän todennäköisyysavaruuden luomiseksi. Paria $(\Omega, \mathcal{F})$ kutsutaan \emph{mitalliseksi avaruudeksi}.
+
+\begin{maar}
+Olkoon pari $(\Omega, \mathcal{F})$ mitallinen avaruus. Tällöin kuvaus $P: \mathcal{F} \mapsto [0,1]$ on \emph{todennäköisyysmitta}, mikäli sille pätee
+\begin{enumerate}
+\item $P(\emptyset) = 0$
+\item jos $A_i\in\mathcal{F}$,\:$i\in\N$ ovat erillisiä, niin $P \left(\bigcup _{i\in \N }A_{i}\right)=\sum _{i\in \N }P (A_{i})$
+\item $P(\Omega) = 1$.
+\end{enumerate}
+\end{maar}
+
+Triplettiä eli kolmikkoa $(\Omega, \mathcal{F}, P)$ kutsutaan \emph{todennäköisyysavaruudeksi}. Kutsumme joukkoja $F \in \mathcal{F}$ \emph{tapahtumiksi} \cite{Tuominen}, ja kaikki joukot $F \subset \Omega$ ovat niin kutsutusti \emph{$\mathcal{F}$-mitallisia}. Erityisesti, todennäköisyyslaskennan viitekehyksessä 
+\begin{equation}
+P(F) = \text{''todennäköisyys sille, että tapahtuma F tapatuu''}.
+\end{equation}
+Tässä vaiheessa ei ole olennaista, mitä täsmällisesti tarkoitamme tapahtuman ''todennäköisyydellä'' satunnaiskokeessa\footnote{Erityisesti ns. frekventistinen ja bayesiläinen näkökulma satunnaiskokeen tuloksen todennäköisyyksiin ovat mielekkäitä käytännön tarkastelussa. Tutkielman teoreettisessa viitekehyksessä olemme tyytyväisiä siihen, että rakentamamme todennäköisyysmitta liittää tapahtumiin todennäköisyydet intuitiivisessa mielessä. Todennäköisyyskäsitteen tulkinnasta lisää esimerkiksi Andrei Khrennikovin kirjassa Interpretations of Probability (de Gruyter, 2. painos, 2009) \cite{Andrei}.}. Erityisesti, jos $P(F)=1$, sanomme että tapahtuma $F$ tapahtuu todennäköisyydellä $1$ eli \emph{melkein varmasti} (m.v, engl. \emph{almost surely (a.s.}) \cite{Oksendal}, ja vastaavasti jos $P(F)=0$, niin tapahtuma on mahdoton nollamitallisuuden mielessä. Edelleen, kutsumme \emph{alkeistapauksiksi} perusjoukon $\Omega$ alkioita $\omega \in \Omega$, ja nämä alkeistapaukset koostavat tapahtumat $F \in \mathcal{F}$.
+
+\begin{maar}\label{borel} Olkoon $\mathcal{T}$ \: $\R^n$:n avointen osajoukkojen kokoelma. Tällöin joukkokokoelma \emph{Borelin perheen}
+\begin{equation}
+{\displaystyle \operatorname {\mathcal{B}=\mathcal{B}(\R^n)}=\bigcap \{{\mathcal {F}}\subset 2^{\R^n}:{\mathcal {F}}{\mbox{ on sigma-algebra, }}{\mathcal {T}}\subset {\mathcal {F}}\}}
+\end{equation}
+alkioita kutsutaan \emph{Borel-joukoiksi.} $\mathcal{B}$ on siis pienin niistä $\R^n$:n $\sigma$-algebroista, jotka sisältävät $\R^n$:n avoimet osajoukot.
+\end{maar}
+
+Borel-joukot sisältävät kaikki avoimet joukot, kaikki suljetut joukot, kaikki numeroituvat yhdisteet suljetuista joukoista ja kaikki numeroituvat leikkaukset vastaavista numeroituvista joukoista $\R^n$:ssä. Palataan nyt aikaisemmin mainitun \emph{mitallisuuden} määrittelyyn. 
+
+\begin{maar}
+Jos kolmikko $(\Omega, \mathcal{F}, P)$ on todennäköisyysavaruus, niin funktiota $Y:\Omega \mapsto \R^n$ kutsutaan \emph{$\mathcal{F}$-mitalliseksi}, jos
+\begin{equation}
+Y^{-1}(U) = \{\omega \in \Omega : Y(\omega) \in U \} \in \mathcal{F}
+\end{equation}
+kaikille Borel-joukoille $U \in \R^n$.
+\end{maar}
+
+Tarvitsemme myös keinon liittää tarkasteltavan satunnaisilmiön realisoituneet tulokset numeerisiin mittareihin, ja tähän käytämme kirjallisuudessa yleisesti vakiintunutta \emph{satunnaismuuttujan} käsitettä. 
+
+\begin{maar}
+Reaaliarvoista kuvausta $X$ kutsutaan \emph{satunnaismuuttujaksi}, jos jokaiselle Borel-joukolle	$B \subset \R$ pätee
+\begin{equation}
+X^{-1}(B) = \{ \omega : X(\omega) \in B \} \in \mathcal{F}.
+\end{equation}
+Satunnaismuuttuja on siis $\mathcal{F}$-mitallinen funktio $X(\omega) = \Omega \mapsto \mathcal{F}$. Jatkossa käytämme satunnaismuuttujalle lyhyttä merkintää $X(\omega)=X$.
+\end{maar}
+
+Lisäksi jokainen satunnaismuuttuja $X$ virittää \emph{jakauman} $P_X$.
+
+\begin{maar}
+Satunnaismuuttujan $X$ virittämää todennäköisyysmittaa $P_X$ kutsutaan (satunnaismuuttujan $X$) \emph{jakaumaksi}, jos kaikille Borel-joukoille $B$ pätee
+\begin{equation}
+P_X(B) = P(X^{-1}(B)).
+\end{equation} 
+\end{maar}
+
+\section{Katsaus odotusarvoon, Lebesgue-integraaleihin, niiden ominaisuuksiin ja raja-arvoihin}\label{hyppy}
+
+Oleellisena osana todennäköisyyslaskennan työkalupakkia  on satunnaismuuttujan $X$ \emph{Lebesguen integraali}\footnote{Tämän tutkielman viitteessä tarvitsemme integraalin vain satunnaismuuttujan $X$ suhteen, minkä takia tämä lähestymistapa on mielekäs.}, joka voidaan määritellä kolmella askeleella satunnaismuuttujan \emph{odotusarvon} käsitteen avulla \cite{Sondermann}.
+
+
+Ensiksi määrittelemme odotusarvon \emph{yksinkertaiselle} diskreetille satunnaismuuttujalle:
+\begin{maar}\label{lebesgue_diskr}
+Muotoa $X = \sum_{i=1}^n \alpha_i \mathbf{1}_{A_i}$, $\alpha_i \in \R$, $A_i \in \mathcal{F}$ olevan\footnote{Muistutuksena, että merkinnällä $\mathbf{1}_{A_i}$ tarkoitamme satunnaismuuttujaan $X(\omega)$ liittyvää \emph{indikaattorifunktiota}, eli tarkemmin $\mathbf{1}_{A_i} = \begin{cases} 1 \text{, jos } \omega \in A_i \\ 0 \text{, jos } \omega \notin A_i \end{cases}$} satunnaismuuttujan \emph{odotusarvo} ja vastaavasti \emph{Lebesguen integraali} on
+\begin{equation}
+E(X) = \int_\Omega X(\omega) d P(\omega) := \sum_i \alpha_i P[A_i].
+\end{equation}
+Selkeyden vuoksi sanottakoon, että yleensä kirjoitamme edellisen integraalin lyhennettynä muodossa $\int_\Omega X dP$.
+\end{maar}
+Olkoon $\mathcal{E}$ kaikkien diskreettejen satunnaismuuttujien joukko. Seuraavaksi konstruoimme integraalin kaikille niille (jatkuville) satunnaismuuttujille, jotka ovat monotonisten diskreettien satunnaismuuttujien raja-arvoja eli joukolle
+\begin{equation}
+\mathcal{E}^* := \lbrace X : \exists u_1 \leq u_2 \leq \dots , u_n \in \mathcal{E}, u_n \uparrow X \rbrace.  
+\end{equation}
+Nyt määrittelemme tällaiselle raja-arvosatunnaismuuttujalle $X\in \mathcal{E}^*$ seuraavasti:
+\begin{equation}
+\int_\Omega X dP := \lim_{n\rightarrow \infty} \int_\Omega u_n dP.
+\end{equation}
+Kolmanneksi eli viimeiseksi integraalin konstruoinnissa käytämme mielivaltaiselle satunnaismuuttujalle $X$ hajotelmaa $X = X^+ - X^-$, missä $X^+ = \sup(X,0)$ ja $X^- = \sup(-X,0)$. Äskeisen perusteella $X^+, X^- \in \mathcal{E}^*$. Seuraavaksi määrittelemme yleisen Lebesguen integraalin: jos $E(X^+) <\infty $ tai $E(X^-) < \infty$, niin
+\begin{equation}
+\int_\Omega X dP = \int_\Omega X^+ dP - \int_\Omega X^- dP,
+\end{equation}
+eli todennäköisyyslaskennan mielessä satunnaismuuttujan $X$ odotusarvo on
+\begin{equation}
+E(X) = E(X^+) - E(X^-).
+\end{equation}
+
+Esittelen nyt muutamia Lebesguen integraalin -- ja samalla odotusarvon -- ominaisuuksia lyhyesti \cite{Sondermann}, jotta voimme jatkossa nojautua yleisimpiin raja-arvoihin ja epäyhtälöihin. Näihin raja-arvotuloksiin palaamme seuraavissa kappaleissa.
+
+\begin{lem}
+Lebesguen integraaleilla on seuraavat ominaisuudet:
+\begin{enumerate}[(a)]
+\item Lineaarisuus: Joillekin vakioille $a\in\R^n$, $b\in\R^n$ ja satunnaismuuttujille $X$, $Y$ pätee 
+\begin{equation}
+\int_\Omega (aX+bY) dP = a\int_\Omega X dP + b\int_\Omega Y dP.
+\end{equation}
+\item Lisäksi satunnaismuuttujan $X$ positiivisuudesta seuraa integraalin positiivisuus: 
+\begin{equation}
+X>0 \text{ (tai } X\geq 0 )\Rightarrow \int_\Omega X dP > 0 \text{ (vastaavasti } \int_\Omega X dP \geq 0),
+\end{equation}
+ja lisäksi
+\begin{equation}
+\int_\Omega X dP > 0 \Leftrightarrow P(X>0) > 0.
+\end{equation}
+\item Lebesguen integraalille pätee myös ns. Beppo Levin teoreema eli monotoninen suppeneminen: Olkoon $\{X_n	\}_{n=1}^\infty$ kasvava jono satunnaismuuttujia. Nyt jonolle on olemassa raja-arvo
+\begin{equation}
+X = \lim_{x \rightarrow \infty} X_n \in \mathcal{E}^*,
+\end{equation}
+ja edelleen
+\begin{equation}
+\lim_{x \rightarrow \infty} \int_\Omega X_n dP = \int_\Omega \lim_{x \rightarrow \infty} X_n dP = \int_\Omega X dP.
+\end{equation}
+\item Fatoun lemma. Vastaavasti kuin yllä, olkoon $\{X\}_{n=1}^\infty$ jono satunnaismuuttujia mikä on alhaalta rajoitettu eli $X>C$ jollekin vakiolle $C$. Nyt 
+\begin{equation}
+\int_\Omega \liminf_{n \rightarrow \infty} X_n dP \leq \liminf_{n \rightarrow \infty} \int_\Omega X_n dP,
+\end{equation}
+ja vastaavasti ylhäältä rajoitetulle satunnaismuuttujajonolle
+\begin{equation}
+\int_\Omega \limsup_{n \rightarrow \infty} X_n dP \geq \limsup_{n \rightarrow \infty} \int_\Omega X_n dP.
+\end{equation} 
+\item Viimeisenä tässä listattu ominaisuus integraalille esitetään odotusarvon muodossa: Jensenin epäyhtälön mukaan jos $X$ on integroituva satunnaismuuttuja $\R$:ssä, ja $f: \bar{\R} \mapsto \bar{\R}$ konveksi\footnote{Sanomme, että funktio on konveksi, jos
+kaikille $x_{1},x_{2}\in \mathbb{R}^d$ ja $t\in [0,1]$ pätee$ f(tx_{1}+(1-t)x_{2})\leq tf(x_{1})+(1-t)f(x_{2})$.} funktio\footnote{Merkinnällä $\bar{\R}$ tarkoitamme ns. laajennettua reaalilukujen joukkoa $\bar{\R} = [-\infty,\infty]$}, niin
+\begin{equation}
+f(E(X)) \leq E(f(X)).
+\end{equation}
+\end{enumerate}
+
+\begin{proof}
+Sivuutetaan, sillä nämä ominaisuudet ovat esitelty integraalin soveltamistarpeita ajatellen ja todistaminen laajentaisi tutkielmaa tarpeettomaksi. Todistukset löytyvät esimerkiksi lähteestä \cite{Durrett}.
+\end{proof}
+
+\end{lem}
+
+Lebesguen integraaleilla on monia vahvuuksia perinteisiin Riemann-integraaleihin nähden, mutta erityisesti raja-arvoteoreemat satunnaismuuttujille perustelevat Lebesguen integraalin käytön stokastiikan kontekstissa\footnote{Aiheesta lisää esimerkiksi lähteessä \cite{Oksendal}, mutta tarkastelemme satunnaismuuttujien raja-arvoja myöhemmin tutkielmassa.}. Siirrymme seuraavaksi käsittelemään niin kutsuttua $L^p$-avaruutta, jotta voimme hyödyntää rakentamaamme integraalia esimerkiksi raja-arvokysymyksissä.
+
+\subsection{L\textsuperscript{p}-avaruudet}
+
+Käsittelemme lyhyesti $L^p$-avaruuksia ($1\leq p<\infty$) ja niiden ominaisuuksia. $L^p$-avaruuden olemassaolo ja $L^p$-\emph{normin} määrittely tässä avaruudessa on tärkeää esimerkiksi $\emph{neliöintegroituvuuden}$ käsitteen vuoksi.
+\begin{maar}
+Avaruudella $L^p(\Omega)$ tarkoitamme kaikkien niiden satunnaismuuttujien $X$ kokoelmaa tripletissä $(\Omega,\mathcal{F},P)$, joille pätee
+\begin{equation}
+E(|X|^p) < \infty
+\end{equation}
+jollekin $1\leq p<\infty$. Jos $X \in L^p$, niin \emph{$L^p$-normi} on
+\begin{equation}
+||X||_p = \left( E(|X|^p)\right) ^\frac{1}{p}.
+\end{equation}
+\end{maar}
+Tällä $L^p$-normilla on muun muassa seuraavat ominaisuudet:
+\begin{lem}\label{Holder}
+\begin{enumerate}[(a)]
+\item Hölderin epäyhtälö satunnaismuuttujien $L^p$-normeille: olkoon $X\in L^p(\Omega)$ ja $Y\in L^q(\Omega)$, missä $1/p + 1/q = 1$. Nyt 
+\begin{equation}
+\int_\Omega |X||Y| dP \leq \left( \int_\Omega |X|^p dP \right)^\frac{1}{p} \left( \int_\Omega |Y|^q dP \right)^\frac{1}{q} < \infty.
+\end{equation}
+\item Jos $p<q$, niin $L^q \subset L^p$.
+\item Avaruus $L^p(\Omega)$ osoittautuu normitetuksi vektoriavaruudeksi, sillä $X,Y\in L^p(\Omega) \Rightarrow X+Y \in L^p(\Omega)$ ja edelleen $p$-normeille pätee kolmioepäyhtälö $||X+Y||_p \leq ||X||_p + ||Y||_p$.
+\end{enumerate}
+\end{lem}
+
+$L^p$-avaruuksien tärkeä erikoistapaus todennäköisyyslaskennan mielessä on tapaus $p=2$. Sanomme, että $L^2$-avaruuden alkiot ovat \emph{neliöintegroituvia}, ja tässä avaruudessa voimme määritellä \emph{skalaaritulon}.
+
+\begin{maar}
+Neliöintegroituville satunnaismuuttujille $X,Y$ \emph{skalaaritulo} määritellään integraalina
+\begin{equation}
+\langle X,Y \rangle = \int_\Omega XY dP,
+\end{equation}
+josta seuraa
+\begin{equation}
+||X||_2 = \sqrt{\langle X,X \rangle}.
+\end{equation}
+\end{maar}
+Edelleen, nyt saamme Hölderin epäyhtälölle \ref{Holder} muodon
+\begin{equation}
+|\langle X,Y \rangle |= \left| \int_\Omega XY dP \right| \leq ||X||_2||Y||_2.
+\end{equation}
+\subsection{Satunnaismuuttujien raja-arvoista}
+
+Kuten kappaleen \ref{hyppy} alussa mainitsimme, Lebesguen integraalin tärkeimmät vahvuudet löytyvät satunnaismuuttujien raja-arvoteoreemista. Nyt määrittelemme niistä yleisimmät. Olkoon seuraavissa määritelmissä $X$ satunnaismuuttuja ja $\{ X_n \}_{n=1}^\infty =: X_n$ 
+satunnaismuuttujajono todennäköisyysavaruudessa $(\Omega, \mathcal{F}, P)$.
+
+\begin{maar}
+Sanomme, että jono $X_n$ suppenee kohti satunnaismuuttujaa $X$ $P$-melkein varmasti (m.v., \emph{engl. almost surely, a.s.}) jos
+\begin{equation}
+P(\{ \omega : X_n(\omega) \rightarrow X(\omega)\}) = 1.
+\end{equation}
+Tällöin sanomme, että $X_n \rightarrow X$ $P-m.v.$
+\end{maar}
+
+\begin{maar}
+Sanomme, että jono $X_n$ suppenee \emph{todennäköisyys-mielessä} kohti satunnaismuuttujaa $X$, jos jokaiselle $\varepsilon > 0$
+\begin{equation}
+\lim_{n \rightarrow \infty} P(|X_n - X| > \varepsilon) = 0
+\end{equation}
+ja tällöin merkitsemme $P-\lim X_n = X$.
+\end{maar}
+
+\begin{maar}
+Olkoon $X_n$ $L^p(\Omega)$:ssä jollekin $1\leq p < \infty$. Tällöin $X_n$ suppenee kohti satunnaismuuttujaa $X$ $L^p$:ssä, jos 
+\begin{equation}
+\lim_{n \rightarrow \infty} ||X_n - X||_p = 0.
+\end{equation}
+Tällöin merkitsemme $X_n \rightarrow X$ $L^p$:ssä.
+\end{maar}
+
+\begin{maar}
+Jono $X_n$ suppenee \emph{jakaumamielessä} tai \emph{heikosti} (\emph{engl. in distribution, weakly}), jos jollakin metrisellä avaruudella $E$ jatkuvalle ja rajoitetulle funktiolle $f: E \mapsto \R$ pätee 
+\begin{equation}
+\lim_{n \rightarrow \infty} \int_{\Omega_n} f(X_n) dP_n = \lim_{n \rightarrow \infty} \int_\Omega f(X) dP.
+\end{equation}
+Tällöin kirjoitamme $X_n \xrightarrow{f} X$, $X_n \xrightarrow{d} X$ tai $X_n \rightarrow X$ heikosti.
+\end{maar}
+
+Satunnaismuuttujien suppenemiseen liittyy olennaisesti tärkeä aputulos \emph{Borel-Cantellin lemma.}. Esittelemme sen vielä ennen siirtymistä stokastisiin prosesseihin.
+
+\begin{lem}\label{borel-cantell}(Borel-Cantell)
+Jos jollekin tapahtumajonolle $A_n$ pätee
+\begin{equation}
+\sum_{n=1}^\infty P(A_n) < \infty,
+\end{equation}
+niin\footnote{Muistutuksena lukijalle, että $\limsup_{n\rightarrow\infty} A_n = \lim_{m\rightarrow\infty} \cup_{n=m}^\infty A_n$. Jos tapahtumat $A_n$ ovat perusjoukon $\Omega$ alkioita, voidaan $\limsup A_n$ tulkita niiden alkeistapauksien $\omega$ joukkona jotka kuuluvat äärettömän moneen tapahtumajonon $A_n$ alkioon.}
+\begin{equation}
+P(\limsup_{n \rightarrow \infty} A_n) = 0.
+\end{equation}
+\begin{proof}
+Olkoon $N=\sum_k \mathbf{1}_{A_k}$ realisoituneiden tapahtumien lukumäärä. Nyt
+\begin{equation}
+E(N) = \sum_k P(A_k) < \infty,
+\end{equation}
+jolloin $P$-melkein varmasti $N < \infty$, jolloin käsitteen $\limsup$ tulkinnan myötä tulos on todistettu.
+\end{proof}
+\end{lem}
+
+Nyt kun olemme esitelleet yleisiä raja-arvotuloksia satunnaismuuttujille, voimme aloittaa valmistautumisen stokastisten prosessien käsittelyyn. Tämä on luonnollista, sillä stokastiset prosessit ovat hyvin usein aikasidonnaisia ja niiden mielenkiintoisimmat ominaisuudet esiintyvät usein silloin, kun aika $t\rightarrow\infty$.
+
+\section{Työkaluja stokastisten prosessien käsittelyyn}
+		
+Stokastiset prosessit ovat modernin stokastiikan olennaisimpia rakennuspalikoita. Tarvitsemme niiden käsittelyyn ns. prosessien historiaa ja havaittua informaatiota kuvaavien \emph{filtraatioiden} sekä niihin liittyvän ehdollisen odotusarvon käsitteet. Näiden jälkeen esittelemme \emph{martingaalien} käsitteen ja \emph{pysähdysajan} stokastisille prosesseille. Aloitamme tarkastelun \emph{filtraatioiden} käsitteestä ja etenemme luontevasti näiden avulla kohti stokastisten prosessien määrittelyä, ja lopulta voimme siirtyä Brownin liikkeeseen.
+
+\subsection{Filtraatiot}\label{filtraatiot}
+
+Todennäköisyysavaruuden historiaa eli aiemmin havaittua informaatiota kuvataan usein \emph{filtraatiolla}:
+\begin{maar}
+Sanomme, että kasvava kokoelma $\mathcal{F}$:n ali-$\sigma$-algebroja  $\{\mathcal{F}_t\}_{t\leq 0}$ on \emph{filtraatio}, jos
+\begin{enumerate}
+\item $\mathcal{F}_t$ on $\mathcal{F}$:n ali-$\sigma$-algebra, joka sisältää kaikki P-tyhjät joukot $\mathcal{F}$:stä ja 
+\item kuvaus $t \mapsto \mathcal{F}_t$ on oikealta jatkuva.
+\end{enumerate}
+\end{maar}
+$\sigma$-algebraa $\mathcal{F}$ voidaan kuvailla joukkona havaittavia\footnote{Tämä jälleen ns. satunnaisilmiöiden mielessä, eli satunnaisilmiön arpomisen jälkeen havaittavien tapahtumien joukkona.} tapahtumia, ja vastaavasti $\mathcal{F}_t$:tä ennen ajanhetkeä $t$ havaittavien tapahtumien joukkoa.
+
+Filtraation myötä voimme ottaa käsittelyyn ns. historiatiedon omaavan eli laajennetun todennäköisyystripletin, jota kutsumme \emph{stokastiseksi kannaksi}.
+
+\begin{maar}
+Sanomme nelikkoa $(\Omega, \mathcal{F},P,\{\mathcal{F}_t\}_{t\leq 0})$ \emph{stokastiseksi kannaksi} (\emph{engl. Stochastic Basis}), jos 
+\begin{enumerate}
+\item $(\Omega, \mathcal{F},P)$ on täydellinen todennäköisyysavaruus ja 
+\item $\{\mathcal{F}_t\}_{t\leq 0}$ on sen filtraatio.
+\end{enumerate}
+\end{maar}
+
+Lisäksi liitämme tällaiseen filtraatioon $\sigma$-algebran $\mathcal{P}$ \emph{progressiivisesti mitallisista osajoukoista} $\Omega \times \mathbb{R}_+$ seuraavasti:
+
+\begin{maar}
+$\mathcal{P} = \mathcal{P}(\mathcal{F})$ on joukkojen $A \subset \Omega \times \mathbb{R}_+$ $\sigma$-algebra siten, että jokaiselle $t\leq 0$ pätee
+\begin{equation}
+A\cap (\Omega \times [0,t]) \in \mathcal{F}_t \otimes \mathcal{B}_{[0,t]},
+\end{equation}
+missä laskutoimitus $\otimes$ viittaa vekoriavaruuksien $\mathcal{F}_t$ ja $\mathcal{B}_{[0,t]}$ väliseen tensorituloon\footnote{Määritelty esimerkiksi kirjan \cite{Pardoux} sivulla 518.}.
+\end{maar}
+
+
+\subsection{Ehdollinen odotusarvo ja johdanto stokastisiin prosesseihin}
+
+Ehdollinen odotusarvo on tärkeä työkalu stokastisten prosessien rakentamisessa. Ehdollisella odotusarvolla voimme laskea ja hahmottaa esimerkiksi satunnaismuuttujan odotusarvon jonkin tietyn tapahtuman tapahtumisen ehdolla\footnote{Tämä voidaan esimerkiksi määritellä \emph{posteriorijakauman} $f_{X|Y}$ odotusarvona $E(X)$}. Tai yleisemmin voimme tarkastella satunnaisprosessin kulkua jo aiemmin tapahtuneen tapahtuman luoman informaation avulla. 
+
+Tässä kappaleessa hyppäämme tuntemattomaan, kun määrittelemme yleisen \emph{ehdollisen odotusarvon} ortogonaalisena projektiona -- kuten Pardoux ja Rascanu kirjassaan \cite{Pardoux} -- yhdeltä todennäköisyystripletiltä toiselle. Tämä vaatii kuitenkin alustuksen kyseisille kolmikoille:
+
+\begin{maar}
+Oletetaan, että $\mathcal{G}$ ja $\mathcal{H}$ ovat $\sigma$-algebran $\mathcal{F}$ ali-$\sigma$-algebroja todennäköisyysavaruudessa $(\Omega,\mathcal{F},P)$. Lisäksi yksinkertaisuuden vuoksi oletamme, että $\mathcal{G}$ ja $\mathcal{H}$ sisältävät kokoelman kaikista $\mathcal{F}$:n $P$-tyhjistä osajoukoista. Tällöin satunnaismuuttujan $X$ \emph{ehdollinen odotusarvo} ehdolla $\mathcal{G}$ on orthogonaalinen projektio\footnote{$P$-tyhjien osajoukkojen sisältyminen tekee $L^2(\Omega,\mathcal{G},P)$:stä $L^2(\Omega,\mathcal{F},P)$:n \emph{ali-Hilbert-avaruuden} \cite{Pardoux} eli täydellisen sisätuloavaruuden \cite{Conway}.} avaruudesta\footnote{Lukijalle muistutuksena, että jos  $X$ on satunnaismuuttuja ja $E(|X|^2) < \infty$, niin $X \in L^2$. Erityisesti, $L^2$-avaruudet ovat Hilbertin avaruuksia \cite{Conway}.} $L^2(\Omega,\mathcal{F},P)$ avaruudelle $L^2(\Omega,\mathcal{G},P)$. Merkitsemme tällaista ehdollista odotusarvoa
+\begin{equation}
+E(X|\mathcal{G}).
+\end{equation}
+\end{maar}
+
+Huomion arvoista ehdollisessa odotusarvossa on, että $E(X|\mathcal{G})$ on satunnaismuuttuja, toisin kuin aikaisemmin määritelty ei-ehdollinen odotusarvo $E(X)$. Erityisesti, $E(X|\mathcal{G})$ on $\mathcal{G}$-mitallinen ja kaikille $Y\in L^2(\Omega,\mathcal{G},P)$ pätee
+\begin{equation}
+E(YX) = E(YE(X|\mathcal{G})),
+\end{equation}
+ja edelleen jos $Y=1$, niin\footnote{Alkiolla $Y=1$ tarkoitamme avaruuden yksikköalkiota, toisin sanoen kaikille avaruuden alkioille $u$ pätee $1u = u1 = u$ yleisen kertolaskutoimituksen merkinnöin.}
+\begin{equation}\label{iterexp}
+E(E(X|\mathcal{G})) = E(X).
+\end{equation}
+Yhtälöä \ref{iterexp} kutsutaan ns. \emph{iteroiduksi odotusarvoksi}. Tutkielman luonteen vuoksi jätämme ehdollisen odotusarvon muut ominaisuudet lukijalle tutustuttavaksi, erityisesti kuten kirjassa \cite{Pardoux} propositio $(1.28)$ tai laajemmin ansioituneen kirjan \cite{Durrett} kappaleesta $5$.
+
+
+Käytämme loppukappaleen \emph{stokastisten prosessien} esittelemiseen. Kuten tässä tutkielmassa on tullut tavaksi, tarkoituksenamme on esitellä stokastisten prosessien ydinkäsitteistöä mielekkään kokonaisuuden luomiseksi, mutta näiden tarkemmat -- jopa tärkeimmät -- ominaisuudet ja käsitteet jätämme muille lähteille, erityisesti kirjoihin \cite{Durrett} ja \cite{Sottinentnt}. Koska emme käsittele kaikkia stokastisten prosessien ominaisuuksia tässä, lukijan tulee muihin lähteisiin tutustuessa erityisesti kiinnittää huomiota ydinkäsitteisiin kuten \emph{Markov-ominaisuuteen ja stationaarisuuteen}. Pyrimme avaamaan lisää ydinkäsitteitä esimerkiksi \emph{Brownin liikkeen} esittelyn yhteydessä.
+
+\begin{maar}
+Olkoon $\mathbb{X}$ topologinen avaruus\footnote{Kirja \cite{Armstrong}, määritelmä $(2.1)$. Mielekäs määritelmä avointen joukkojen avulla.}	ja $\mathbb{T} \subset \mathbb{R}^d$ Borel-joukko. Kuvaus $X:\Omega \times \mathbb{T} \mapsto \mathbb{X}$ on $\mathbb{X}$-arvoinen \emph{stokastinen prosessi} (engl. Stochastic Process), jos jokaiselle $t\in \mathbb{T}$ $X(\cdot, t)$ on $\mathbb{X}$-arvoinen satunnaismuuttuja.
+\end{maar}
+Lyhennämme jatkossa merkintätapaa ja merkitsemme $X_t = X(\cdot,t)$. Yksittäisiä satunnaisilmiön realisoituja kuvauksia $t \mapsto X(\omega,t)$, $ \omega \in \Omega$, kutsumme stokastisen prosessin \emph{poluiksi}. Yleistetysti kutsumme siis kaikkia ajasta riippuvia satunnaismuuttujajonoja $\{X_t\}_{t\geq 0}$ stokastisiksi prosesseiksi. Joskus kirjallisuudessa stokastinen prosessi terminä viittaa nimen omaan yksiuloitteiseen prosessiin\footnote{Katso esimerkiksi \cite{Pardoux}.}, mutta jatkossa tutkielmassa viittaamme termillä yleisesti kaikkiin stokastisiin prosesseihin, ja tarkennamme käsitettä tarvittaessa.
+
+Liitämme stokastisiin prosesseihin prosessin \emph{historian} käsitteen kätevästi filtraatioiden avulla. Yhdistämme niin kutsutun \emph{luonnollisen filtraation} stokastiseen prosessiin $X:\Omega \times \mathbb{R_+} \mapsto \mathbb{X}$, mikä on filtraatio 
+\begin{equation}
+\mathcal{F}_t^X = \sigma \{ X_s : s \leq t \} \vee \mathcal{N}, 
+\end{equation} 
+missä $\mathcal{N}$ on kokoelma $P$-tyhjiä joukkoja algebrassa $\mathcal{F}$, $\sigma \{ X_s : s \leq t \}$ kuvaa joukon $X_s : s \leq t$ virittämää $\sigma$-algebraa ja edelleen relaatiosymbolilla $\vee$ tarkoitamme pienintä sellaista $\sigma$-algebraa, joka on muodostettu symbolia $\vee$ ympäröivien joukkojen yhdisteestä. 
+
+Lisäksi sanomme yleisesti, että stokastista prosessia $X:\Omega \times \mathbb{R}_+ \mapsto \mathbb{X}$ sanotaan $\mathcal{P}$-progressiivisesti mitalliseksi, jos $X$ on $(\mathcal{P},\mathcal{B}_\mathbb{X})$-mitallinen kappaleen \ref{filtraatiot} merkintöjen mukaisesti.
+
+\subsection{Pysäytysaika ja martingaalit}
+
+Nyt esittelemme lyhyesti pysäytysajan ja martingaalien käsitteet ennen Brownin liikkeeseen siirtymistä.
+\begin{maar}\label{pysäytysaika}
+Jos kiinnitämme stokastisen kannan $(\Omega, \mathcal{F}, P, \{ \mathcal{F}\}_{t \geq 0})$ niin sanomme, että satunnaismuuttuja $\tau : \Omega \mapsto [0,\infty]$ on pysäytysaika jos
+\begin{equation}
+\{ \tau \leq t\} = \{ \omega \in \Omega : \tau(\omega) \leq t\} \in \mathcal{F}_t,
+\end{equation}
+kaikilla $t\in [0,\infty]$. 
+\end{maar}
+Huomaamme, että koska filtraatio on oikealta jatkuva funktio eli $\mathcal{F}=\mathcal{F}_+$, niin määritelmä \ref{pysäytysaika} voidaan esittää myös muodossa
+\begin{equation}
+\tau \text{ on pysätysaika } \Leftrightarrow \{ \tau < t \} \in \mathcal{F},
+\end{equation}
+kaikilla $t\in [0,\infty]$. Pysäytysaika $\tau$ tulkitaan aikana, milloin tarkasteltava stokastinen prosessi käyttäytyy tietynlaiseti, esimerkiksi saapuu tiettyyn pisteeseen. 
+
+\emph{Martingaalien} käsite on amerikkalaisen matemaatikon Joseph L. Doobin (1910-2004) käsialaa. Martingaalien teoria on tärkeä työkalu analysoidessa jatkuva-aikaisia satunnaismuuttujien liikkeitä, sillä ne kertovat olennaista tietoa prosessien odotusarvoisesta käytöksestä tulevina ajanhetkinä. Esittelemme myös Doobin martingaaliepäyhtälön, mutta martingaalien muuta teoriaa vain nopeasti. Kattavamman katsauksen saamikseksi martingaalien teoriaan liittyen lukijan on syytä lähestyä esimerkiksi teoksia \cite{Follmer}, \cite{Williams} tai \cite{Oksendal}.
+
+\begin{maar}\label{martingaalimaar}
+Olkoon $(\Omega, \mathcal{F},P,\{\mathcal{F}_t\}_{t\leq 0})$ annettu stokastinen kanta, ja $\mathcal{P}$ tähän liitoksissa oleva $\sigma$-algebra kuten osiossa \ref{filtraatiot}. Nyt $\mathcal{P}$-mitallinen $d$-ulotteinen stokastinen prosessi $M_t$ on \emph{martingaali}, jos 
+\begin{enumerate}[(1)]
+\item $E(|M_t|)<\infty$ kaikille $t\geq 0$ ja
+\item\label{mart2} $E(M_t | \mathcal{F}_s) = M_s$ $P-\text{m.v.}$ kaikille $s \leq t$.
+\end{enumerate}
+Jos kohdan \ref{mart2} yhtälö vaihdetaan epäyhtälöiksi $\leq$ tai $\geq$, niin kutsumme stokastista prosessia vastaavasti \emph{ylimartingaaliksi} tai \emph{alimartingaaliksi}. Lisäksi sanomme, että martingaali $M_t$ on jatkuva, mikäli sen polkufunktio $t\mapsto M_t$ on jatkuva funktio määrittelyalueellaan.
+\end{maar}
+
+Jos stokastinen prosessi on martingaali, prosessi saa siis tulevaisuuden aikapisteissä odotusarvoisesti samoja arvoja kuin tarkasteluhetkellä $s$. Vastaavasti, jos prosessi on ylimartingaali, saa se odotusarvoisesti pienempiä arvoja kuin tarkasteluhetkellä ja alimartingaaleille vastaavasti suurempia arvoja. 
+
+Martingaaleihin liittyy olennaisesti monia tärkeitä tuloksia stokastisten differentiaaliyhtälöiden teorian kannalta ja esittelemme niistä myöhemmin esimerkiksi keskeisen \emph{Girsanovin lauseen} neliöheilahtelun käsitteen yhteydessä, mutta nyt esittelemme Doobin martingaaliepäyhtälön myöhempää käyttöä varten.
+
+\begin{lause}\label{Doob}(Doobin martingaaliepäyhtälö):
+Jos $M_t$ on martingaali, jonka polut $t\mapsto M_t$ ovat $P$-melkein varmasti jatkuvia, niin kaikille $p\geq 1$, $T>0$ ja $\lambda>0$ pätee 
+\begin{equation}
+P(\sup_{0\leq t\leq T}|M_t| \geq \lambda) \leq \frac{1}{\lambda^p}E(|M_T|^p).
+\end{equation}
+\begin{proof}
+Sivuutetaan.
+\end{proof}
+\end{lause}
+
+Esittelemme lisää martingaaleihin liittyviä tuloksia, kunhan saamme alustettua Brownin liikkeeseen ja Itô-analyysiin liittyvää teoriaa. Nyt olemme esitelleet tutkielman kannalta kriittisiä stokastisten prosessien ominaisuuksia ja niihin liittyviä käsitteitä ja voimme siirtyä erikoistumaan kohti stokastisten prosessien erikoistapausta, Brownin liikettä.
+
+\section{Brownin liike}
+
+\emph{Brownin liike} (engl. Brownian motion, BM) on stokastisten prosessien erikoistapaus, jolla kuvataan muun muassa atomi- tai molekyylivärähtelyn aiheuttamaa hiukkasten satunnaisliikettä nesteessä tai kaasussa \cite{Feynman} tai rahoitusinstrumenttien hinnan muutoksia ajan suhteen \cite{Sondermann}. Brownin liike liittyy olennaisesti \emph{normaalijakautuneisiin} eli \emph{Gaussisiin} satunnaismuuttujiin\footnote{Gaussiset satunnaismuuttujat muodostavat mielenkiintoisen tarkastelukohdan niin luonnontieteissä kuin satunnaisotoksien tulkitsemisessa, sillä \emph{keskeisen raja-arvolauseen mukaan} otannassa saatujen toisistaan riippumattomien satunnaisotosten keskiarvot suppenevat jakaumamielessä (katso kappale \ref{hyppy}) kohti normaalijakaumaa.}, sillä prosessin arvojen eri ajanhetkien erotukset ovat normaalisti jakautuneita \cite{Durrett}.
+
+\begin{maar}
+Sanomme, että satunnaismuuttuja $X$ noudattaa normaalijakaumaa odotusarvolla $\mu$ ja varianssilla $\sigma^2$, jos sen tiheysfunktio\footnote{Lukijalle muistutuksena: funktio $f(x) : \Omega \mapsto R^d$ on satunnaismuuttujan $X$ tiheysfunktio, jos se on koko määrittelyalueellaan positiivinen ja $P(X\in B)=\int_B 1 \text{ d}f(x)$ jollekin Borel-joukolle $B\in\Omega$, ja lisäksi $\int_\Omega 1 \text{ d}f(x)$ = 1. Satunnaismuuttujien tiheysfunktioista ja muista ominaisuuksista lisää kirjassa \cite{Durrett}.} on muotoa 
+\begin{equation}
+f(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.
+\end{equation}
+Tällöin merkitsemme $X \sim N(\mu, \sigma^2)$. Lisäksi sanomme, että $d$-ulotteinen satunnaisvektori $X=(X_1,\dots,X_d)^T$ on normaalijakautunut\footnote{Normaalijakautuneet satunnaisvektorit tunnetaan kirjallisuudessa \emph{moniulotteisena normaalijakaumana}, englanniksi \emph{multinormal distribution}.} jos jokaiselle $a\in \mathbb{R}^d$ summa
+\begin{equation}
+\sum_{i=1}^d a_i X_i
+\end{equation} 
+on normaalijakautunut satunnaismuuttuja. Moniulotteisella normaalijakaumalla on \emph{odotusarvovektori} $\mu=(E(X_1),\dots,E(X_d))^T$ ja \emph{kovarianssimatriisi}\footnote{Joskus kirjallisuudessa kovarianssimatriisi esiintyy myös nimellä varianssi-kovarianssimatriisi.} $\Sigma = E((X-E(X))(X-E(X))^T)$, ja merkitsemme tällöin $X\sim N(\mu,\Sigma)$.
+\end{maar}
+
+Seuraavaksi määrittelemme yksiulotteisen Brownin liikeen. Käymme läpi sen tärkeimpiä ominaisuuksia lyhyesti, jonka jälkeen määrittelemme $d$-ulotteisen Brownin liikkeen ja kolmanneksi yhdistämme näihin määritelmiin filtraation käsitteen. Brownin liikkeen lyhyen esittelyn jälkeen jatkamme vihdoin Itô-integraaleihin ja sitä kautta stokastisiin differentiaaliyhtälöihin.
+
+Brownin liikkeen yleisyys reaalimaailman ilmiöitä mallintaessa seuraa keskeisestä raja-arvolauseesta: olkoon $\{X_n\}_{n=1}^\infty$ jono toisistaan riippumattomia ja samoin jakautuneita satunnaismuuttujia\footnote{Tällaista satunnaismuuttujajonoa kutsutaan usein ns. \emph{i.i.d.}-jonoksi. Lyhenteen alkuperä on englanninkielisessä fraasissa \emph{independent and identically distributed}, suomeksi siis riippumattomat ja samoin jakautuneet.}, joille kaikille $i=1,2,\dots$ pätee $E(X_i)=0$ ja $\text{Var}(X_i) = E(X_i^2) = \sigma^2$. Merkitään näiden satunnaismuuttujien summaa $S_n = X_1 + X_2 + \dots + X_n$. Nyt keskeisen raja-arvolauseen mukaan\footnote{Emme esittele keskeistä raja-arvolausetta tässä tarkemmin, mutta sen sisältö vastaa oleellisesti tämän esimerkin sisältöä yleistetyssä ympäristössä. Lisää esimerkiksi kirjassa \cite{Durrett}.}
+\begin{equation}
+\frac{S_n}{\sigma \sqrt{n}} \rightarrow N(0,1) \text{ heikosti}.
+\end{equation} 
+Edelleen, jos määrittelemme jokaiselle $t \geq 0$ ja $n\in\mathbb{N}$ jonon
+\begin{equation}
+B_t^n = \frac{S_{[nt]}}{\sigma\sqrt{n}},
+\end{equation}
+niin huomaamme vastaavasti, että kaikille $0 \leq s < t$ pätee
+\begin{equation}
+B_t^n - B_s^n \rightarrow N(0,t-s) \text{ heikosti}.
+\end{equation}
+Lisäksi $B_t^n$:n lisäykset ovat riippumattomia ja raja-arvoprosessi on $P-m.v.$ jatkuva. Näillä perusteilla voimme määritellä yksiulotteisen Brownin liikkeen.
+
+\begin{maar}\label{brown}
+Yksiulotteinen \emph{Brownin liike} on jatkuva\footnote{Sanomme, että stokastinen prosessi $B(t,\omega)$ on jatkuva mikäli polut $t \mapsto B(t,\omega)$ ovat jatkuvia $P$-melkein varmasti.} stokastinen prosessi $B: \Omega \times \mathbb{R}_+$, jolle pätee
+\begin{enumerate}[(a)]
+\item $B_0 = 0$,
+\item $B_t - B_s \sim N(0,t-s)$  kaikille $0\leq s < t$,
+\item Jos $t_0 < t_1 < \cdots < t_n$, niin $B(t_0), B(t_1)-B(t_0), \cdots, B(t_n)-B(t_{n-1})$ ovat riippumattomia\footnote{Muistutuksena, että satunnaismuuttujat $X$ ja $Y$ ovat riippumattomia, jos kaikille Borel-joukoille $A,B$ pätee $P(X\in A )P(Y\in B) = P(X \in A, Y \in B)$.}.
+\end{enumerate}
+\end{maar}
+
+Brownin liikkeen merkintää lyhennetään jatkossa yleensä jättämällä alkeistapaus $\omega$ merkitsemättä ja ottamalla aika $t$ alaindeksiin: $B(t,\omega)=B(t)=B_t$. Suoraan määritelmästä \ref{brown} saamme mukavan aputuloksen koskien Brownin liikkeen odotusarvoista liikettä:
+\begin{lem}\label{gammalemma}
+Jokaiselle $p>0$ pätee
+\begin{equation}
+E(|B_t - B_s|)^p = \frac{1}{\sqrt{\pi}}(2|t-s|)^{p/2}\Gamma\big( \frac{p+1}{2} \big),
+\end{equation}
+missä $\Gamma: (0,\infty) \mapsto (0,\infty)$ on gammafunktio
+\begin{equation}
+\Gamma\big( x \big) = \int_0^\infty t^{x-1}e^{-t}\text{ d}t.
+\end{equation}
+\begin{proof}
+Koska $B_t-B_s \sim N(0,t-s)$, voimme merkitä sen standardinormaalijakautuneen satunnaismuuttujan $Z$ avulla seuraavasti: $B_t-B_s = \sqrt{t-s}Z$. Nyt
+\begin{align*}
+E(|B_t-B_s|^p) &= \sqrt{t-s}E(|Z|^p) \\
+&= (|t-s|)^{p/2}\frac{1}{\sqrt{2\pi}} 2\int_0^\infty z^p e^{-z^2 /2} \text{ d}z \\
+&= \frac{1}{\sqrt{\pi}}(2|t-s|)^{p/2} \int_0^\infty z^p e^{-z^2 /2} \text{ d}z \\
+&= \frac{1}{\sqrt{\pi}}(2|t-s|)^{p/2} \Gamma\big( \frac{p+1}{2}\big).
+\end{align*}
+\end{proof}
+\end{lem}
+Lemmasta \ref{gammalemma} seuraa suoraan, että inkrementaatioiden ensimmäisille keskusmomenteille pätee\footnote{Lukijalle muistutuksena seuraavat gammafunktion $\Gamma$ ominaisuudet: $\Gamma(x+1)=x\Gamma(x)$, $\Gamma(1)=1$ ja $\Gamma(1/2) = \pi$.}
+\begin{align}
+E(|B_t - B_s|) &= \sqrt{\frac{2}{\pi}|t-s|}, \\
+E(|B_t - B_s|^2) &= |t-s| \text{ ja }\\
+E(|B_t - B_s|^4) &= 3(t-s)^2.
+\end{align}
+
+Usein mielenkiinnon kohteena on myös moniulotteinen Brownin liike. 
+
+\begin{maar}\label{dbrown}
+$\mathbb{R}^d$:ssä arvojaan saavaa stokastista prosessia $\{B_t, t\geq 0 \}$ kutsutaan $d$-ulotteisesti Brownin liikkeeksi, jos sen komponentit $B_t^1, \dots, B_t^d$ ovat toisistaan riippumattomia yksiulotteisia Brownin liikkeitä.
+\end{maar}
+
+Määritelmästä \ref{dbrown} seuraa suoraan, että moniulotteinen Brownin liike voitaisiin määritellä myös ilman yksiulotteisen liikkeen apua: $\{B_t, t\geq 0 \}$ on $d$-ulotteinen Brownin liike, jos 
+\begin{enumerate}[(i)]
+\item $B_0 = 0$,
+\item $B_t - B_s \sim N(0,(t-s)I_{d\times d})$ joillekin $0 \leq s < t$ ja
+\item $B_{t1} - B_{t0}, \dots, B_{tk} - B_{t(k-1)}$ ovat riippumattomia satunnaisvektoreita kaikilla $k > 1$ ja $0=t_0 < t_1 < \dots < t_k$.
+\end{enumerate}
+
+Brownin liikkeen luonnollinen filtraatio voidaan määritellä yksinkertaisesti, $t\geq 0$ ja 
+\begin{equation}
+\mathcal{F}_t^B = \sigma(\{ B_s: 0 \leq s \leq t \}) \vee \mathcal{N},
+\end{equation}
+missä $\mathcal{N}$ on kokoelma $P$-tyhjiä joukkoja. Kuitenkaan luonnollisen filtraation $\mathcal{F}_t^B$ sisältämä historiainformaatio ei aina riitä sovellustapauksissa. Tällaisia tapauksia ovat esimerkiksi ne, joissa tarkastelemme Brownin liikkeen ohella jotain toista satunnaismuuttujaa tai -prosessia. Nämä tilanteet motivoivat määrittelemään Brownin liikkeen vielä kolmannella tavalla, jossa hyödynnämme filtraatioiden käsitettä.
+
+\begin{maar}\label{filtrbrown}
+Olkoon $\{ \Omega, \mathcal{F}, P, \{ \mathcal{F}\}_{t\geq 0} \}$ stokastinen kanta ja $\mathcal{P}$ siihen liitetty progressiivisesti mitallisten $\Omega \times \mathbb{R}_+$:n osajoukkojen $\sigma$-algebra.
+
+$d$-ulotteista, $\mathcal{P}$-progressiivisesti mitallista ja jatkuvaa stokastista prosessia $B$ kutsutaan \emph{$d$-ulotteiseksi $\mathcal{F}_t$-Brownin liikkeeksi}, jos 
+\begin{enumerate}[(i)]
+\item $B_0 = 0$,
+\item $B_t - B_s$ on riippumaton $\mathcal{F_s}$:n suhteen ja 
+\item $B_t - B_s \sim N(0, (t-s)I_{d \times d})$. 
+\end{enumerate}
+\end{maar} 
+
+Vaikka määritelmä \ref{filtrbrown} on hyvin samankaltainen määritelmien \ref{dbrown} ja \ref{brown} kanssa, se sisältää jatkoa ajatellen paljon filtraation tuomaa lisäinformaatiota. Lisäksi määritelmä on omiaan liittämään progressiivisesti mitallisten ja jatkuvien prosessien $\mathcal{P}$ käsitteen Brownin liikkeeseen ja sitä kautta edelleen Itô-integraaleihin. Olemme nyt määritelleet ja käyneet läpi paljon esitietoja, ja voimmekin siirtyä tarkastelemaan Itô-analyysin alkuaskelia.
+
+\chapter{Itô-analyysin alkeet ja stokastiset differentiaaliyhtälöt}\label{itoluku}
+
+\section{Itôn perintö stokastisessa analyysissä -- Itôn stokastiset integraalit ja Itôn lemma}
+
+Kyoshi Itô (1915-2008) oli uraauurtava japanilainen matemaatikko, jonka tämän tutkielman kannalta olennaisimmat läpimurrot koskivat stokastisen integraation ja stokastisten differentiaaliyhtälöiden teoriaa: Itô-analyysi kokonaiskäsitteenä ja erityisesti sen tulos Itôn lemma mullisti käsityksen satunnaisliikkeiden käytöksestä.  Kirjallisuudessa yleensä mainitaan Itôn olevan todennäköisyyslaskennan ja satunnaisliikkeiden mallintamisen päänimiä herrojen Kolmogorov, Levy, Wiener ja Markov ohella\footnote{Lohr, Steve (November 23, 2008), "Kiyosi Ito, 93, Mathematician Who Described Random Motion, Dies", NY Times.}.
+
+Tässä luvussa havainnollistamme lukijalle tarpeen Itô-integraalien ja neliöheilahtelun käsitteelle. Itô-integraalit ja Itôn lemman esittelemme niin sanotusti duaalisesti, missä toinen tulos seuraa toisesta pääsääntöisesti kirjojen \cite{Durrett} ja \cite{Sondermann} mukaisesti. Todistamme yksiulotteisen Itôn lemman ja esittelemme tämän lisäksi $d$-ulotteiseen Brownin liikkeeseen sidonnaisen version tästä. Tämän jälkeen esittelemme vielä niin kutsutun yleisen Itô-integraalin yleiselle integrandille. Tämän määritelmän lähestymistapa eroaa hieman aikaisemmista, ja perustelemme yleisen integraalin olemassaolon irrallisena Itôn lemmasta. Näiden jälkeen havainnollistamme Itô-analyysin käytännön hyötyjä siirtymällä stokastisten differentiaaliyhtälöiden teoriaan. 
+
+\subsection{Neliöheilahtelu ja yksiulotteinen Itô-integraali}
+
+Itô-analyysin ero tavanomaiseen analyysiin on tietyllä tapaa yksinkertainen, mutta sitäkin tärkeämpi. ''Perinteisessä'' analyysissä valitsemme joksikin tarkasteltavaksi funktioksi funktion, joka on yleisesti ns. sileä funktio, ja lisäksi hyvin usein integroituva määrittelyalueellaan\footnote{''Natura non facit saltus!'' on kuuluisan saksalaisen tieteilijän Gottfried Leibnizin toteamus, joka tarkoittaa että luonnossa esiintyviä prosesseja mallintaessa ei tule olla epäjatkuvuuksia. Tämä yleistyy matematiikan kielellä siihen, että tällaisten funktioiden tulee olla sileitä. (New Essays on Human Understanding, IV, 16: "la nature ne fait jamais des sauts"}.  Jos esimerkiksi tutkimme funktiota, joka mallintaa esimerkikski satunnaisilmiötä kuten johdannaisen hinnoittelua, ei tämän funktion käyrä ole integroituva missään määrittelyalueellaan\footnote{Huomiona lukijalle, että kun funktioita, joiden massasta suurin osa on epäjatkuvuuspisteitä, löydettiin ensimmäisiä kertoja 1800-luvulla, matemaatikot pitivät tällaisia funktioita vain matemaattisina kuriositeetteinä, joilla ei ole juurikaan sovelluskohteita.}. Tällöin luonnollisesti perinteisen analyysin keinot eivät toimi ja se tarvitsee laajennuksen  ns. rajoittamattomasti heilahteleviin funktioihin. Tähän käyttöön valjastamme \emph{neliöheilahtelun} käsitteen. 
+
+\begin{maar}
+Olkoon $\{\tau_n\}_{n\in\mathbb{N}}$ jono äärellisiä osituksia 
+\begin{equation*}
+\tau_n = \{ 0 = t_0 < t_1 < \dots < t_{i_n} < \infty \},
+\end{equation*}
+joille $t_{i_n} \xrightarrow{n\rightarrow\infty} \infty $ ja $|\tau_n|=\sup|t_{i+1}-t_i| \xrightarrow{n\rightarrow\infty} 0$, ja lisäksi $X$ olkoon reaaliarvoinen ja jatkuva funktio välillä $[0,\infty)$. Jos raja-arvo
+\begin{equation}
+\langle X\rangle_t = \lim_{n\rightarrow\infty} \sum_{t_i \in \tau_n, t_i < t} (X_{t_{i+1}} - X_{t_i})^2
+\end{equation}
+on olemassa kaikilla $t \geq 0$, kutsumme funktiota $t\rightarrow \langle X \rangle_t$ $X$:n \emph{neliöheilahteluksi}. 
+\end{maar}
+
+Funktioita, joilla ei ole positiivista neliöheilahtelua kutsutaan \emph{rajoitetusti heilahteleviksi funktioiksi}. Merkitsemme tällöin $X\in\text{FV}(\mathbb{R}_+)$\footnote{Lukijalle muistutuksena, että $X\in\text{FV}(\mathbb{R}_+)$, jos $\sup_{\tau_n} \sum_{t_i \in \tau_n} |X_{t_{i+1}} - X_{t_i}| < \infty$. Edellistä supremumia kutsutaan kirjallisuudessa yleisesti \emph{kokonaisheilahteluksi}\label{totalvariation} (engl. Total Variation).}. Seuraava lemma havainnollistaa tätä yhteyttä:
+
+\begin{lem}
+Jos $X\in FV(\mathbb{R}_+)$, niin $\langle X \rangle_t = 0$ kaikilla $t\geq 0$.
+
+\begin{proof}
+Kaikille $t\geq 0$ pätee 
+\begin{equation*}
+\sum_{t \geq t_i \in \tau_n} (X_{t_{i+1}} - X_{t_i})^2 \leq \sup |X_{t_{i+1}} - X_{t_i}| \sum |X_{t_{i+1}} - X_{t_i}|.
+\end{equation*}
+Oletuksesta $X\in FV(\mathbb{R}_+)$ seuraa, että tulon jälkimmäinen osapuoli on rajoitettu. Lisäksi $X$ on jatkuva, ja koska jatkuvat funktiot ovat tasaisesti jatkuvia kompakteissa joukoissa, niin
+\begin{equation*}
+\sup |X_{t_{i+1}} - X_{t_i}| \xrightarrow{n\rightarrow\infty} 0,
+\end{equation*}
+mikä todistaa lemman.
+\end{proof}
+\end{lem}
+
+Tässä vaiheessa on tärkeää huomata, että hieman ironisesti $\langle X \rangle_t \in \text{FV}(\mathbb{R}_+)$\footnote{Tämä on helposti todettavissa laskemalla neliöheilahtelulle joko kokonaisheilahtelu tai neliöheilahtelu.}, mistä seuraa että integraali
+\begin{equation}
+\int f(s) d \langle X \rangle_s
+\end{equation}
+on hyvin määritelty Lebesgue-Stieltjes -integraalina jollekin ''sopivasti käyttäytyvälle'' -- tarkemmin Borel-mitalliselle -- funktiolle $f(s)$. Tälle huomiolle tulee käyttöä myöhemmin tässä kappaleessa.
+
+Brownin liikkeen neliöheilahtelu on olennainen osa rahoitusteoreettisia sovelluksia ja kuten seuraavaksi osoitamme, sen neliöheilahtelu on positiivista ja siten Brownin liikkeen analyysiin tarvitsemme Itô-analyysin työkaluja. 
+
+\begin{prop}\label{levyprop}
+(Paul Lévy) Brownin liikkeen $B_t(\omega)$ poluille $t \mapsto B_t(\omega)$ pätee $P$-melkein varmasti
+\begin{equation}
+\langle B \rangle_t (\omega) = t 
+\end{equation}
+kaikilla $t \geq 0$.
+\begin{proof}
+Todistamme väitteen kuten lähteessä \cite{Durrett} kiinnitetylle, mutta arbitraarille rationaaliluvulle $t_o \in \mathbb{Q}_+$. Tämä riittää ilman yleisyyden menettämistä\footnote{Kirjallisuudessa käytetään usein termiä \emph{without loss of generality, w.l.o.g}.}, sillä rationaalilukujen joukko $\mathbb{Q}_+$ on numeroituva. Tällöin Brownin liikkeen polkujen $P$-melkein varmasta jatkuvuudesta seuraa todistuksen yleistyminen kaikille $t\in\mathbb{R}_+$. Merkitään
+\begin{equation}
+X_n := \sum_{t_i\in\tau_n, t_i \leq t_0} (B_{t_{i+1}} - B_{t_i})^2 := \sum_i Y_i^2,
+\end{equation}
+mistä seuraa suoraan $Y_i \sim N(0,\Delta t_{i+1})$. Edelleen toisen momentin tunnusluvut ovat helposti laskettavissa:
+\begin{align}
+E(Y_i^2) &= \text{Var}(Y_i) = \Delta t_{i+1}, \\
+\text{Var}(Y_i^2) &= E(Y_i^4) - E(Y_i^2)^2 = 3\text{Var}(Y_i)^2 - (\Delta t_{i+1})^2 = 2(\Delta t_{i+1})^2.
+\end{align}
+Edelleen keskeisen raja-arvolauseen mukaan
+\begin{equation}
+X_n \xrightarrow{d} N\big(\sum_i \Delta t_i, 2 \sum_i (\Delta t_i)^2 \big).
+\end{equation}
+Selkeästi tämä jakauma suppenee edelleen kohti jakaumaa $N(t_0, 0)$ eli kiinnitettyä rationaalilukua\footnote{Tällaista normaalijakauman erikoistapausta, missä varianssi on 0 ja odotusarvo äärellinen, kutsutaan \emph{Dirac-massaksi} \cite{Pardoux}.} $t_0$, tarkemmin
+\begin{equation}\label{levy_todistus_raja-arvoL2:ssa}
+X_n \xrightarrow{\Delta t_i \rightarrow 0} t_0
+\end{equation} 
+$L^2(P)$-normissa, ja tämän jälkeen pitää vielä osoittaa että suppeneminen pätee myös $P$-melkein varmasti. Merkitään $A_n = |X_n - t_0| \geq \varepsilon $ jollekin kiinnitetylle $\varepsilon > 0$. Nyt raja-arvon \ref{levy_todistus_raja-arvoL2:ssa} perusteella
+\begin{equation}
+\sum_{n=1}^\infty P(A_n) < \infty,
+\end{equation}
+ja edelleen Borel-Cantellin \ref{borel-cantell} mukaan
+\begin{equation}
+P(\limsup_{\Delta t_i \rightarrow 0} A_n) = 0,
+\end{equation}
+eli toisin sanoen $P$-melkein varmasti
+\begin{equation}
+\lim_{\{\tau_n\}_{n=1,2,\dots}} X_n = t_0, 
+\end{equation}
+ja edelleen on olemasssa $\{ \tau_n\}$:n osajono $\{\tau_{n'}\}$ siten, että 
+\begin{equation}
+\langle B \rangle_t (\omega) = \lim X_{n'} = t_0
+\end{equation}
+$P$-melkein varmasti. Tämä todistaa väitteen.
+\end{proof}
+\end{prop}
+
+Koska aika $t$ on yleisesti positiivinen suure, propositiosta \ref{levyprop} seuraa Brownin liikkeen luoman polun neliöheilahtelu, ja tästä edelleen näiden polkujen rajaton heilahtelu. Esittelemme ja todistamme nyt yksiulotteisen Itô:n kaavan, ja samalla määrittelemme Itô-integraalin. Kaava on todistettu ensimmäisen kerran klassikkoartikkelissa \cite{Ito}.
+
+\begin{lause}\label{ito1d}
+(Itôn kaava tai Itôn lemma $\mathbb{R}$:ssä): Olkoon $X:[0,\infty) \mapsto \mathbb{R}$ jatkuva funktio jatkuvalla neliöheilahtelulla $\langle X \rangle_t$, ja lisäksi $F\in C^2(\mathbb{R})$ kahdesti derivoituva reaaliarvoinen funktio. Nyt, kaikilla $t\geq 0$ pätee
+
+\begin{equation}\label{itokaava}
+F(X_t) = F(X_0) + \int_0^t F'(X_s) d X_s + \frac{1}{2}\int_0^t F''(X_s) d\langle X \rangle_s,
+\end{equation}
+missä erityisesti 
+\begin{equation}\label{itoint}
+\int_0^t F'(X_s) d X_s = \lim_{n\rightarrow\infty} \sum_{t_i \in \tau_n, t_i \geq t} F'(X_{t_i})(X_{t_{i+1}}-X_{t_i})
+\end{equation}
+on $F(X_t)$:n \emph{Itô-integraali} $X_t$:n suhteen\footnote{Lukijalle huomautuksena: määrittelemme tämän paljon puhutun Itô-integraalin suorana seurauksena Itôn kaavasta. Vaihtoehtoisesti voitaisiin tulkita, että koska määrittelemme Itô-integraalin näin, niin lause seuraa määritelmästä. Kaavan todistuksessa perustelemme myös integraalin olemassaolon raja-arvona \ref{itoint}.}\footnote{Itôn kaava esitetään usein kirjallisuudessa myös muodossa $dF(X) = F'(X)dX + 1/2 F''(X)d\langle X \rangle$. Tämä muoto on muodon \ref{itokaava} kanssa täysin yhtäpitävä, merkintä esitetään vain derivaattojen avulla integraalimerkinnän sijasta.}.
+
+\begin{proof}
+Kappaleen teeman mukaisesti, olkoon $t > 0$, $t_i \in \tau_n$, $t_i \leq t$. Nyt Taylorin sarjan\footnote{Lukijalle muistutuksena, että Taylorin sarjalla tarkoitetaan sarjaa jolla approksimoidaan tehokkaasti jatkuvasti derivoituvia funktioita polynomeiksi. Lisää Taylorin sarjoista esimerkiksi lähteessä \cite{koskenoja}.} mukaan pätee
+
+\begin{align}
+F(X_{t_{i+1}}) - F(X_{t_i}) &= F'(X_{t_i})\Delta X_{t_i} + \frac{1}{2}F''(X_{\tilde{t}_i})(\Delta X_{t_i})^2 \nonumber \\
+&= F'(X_{t_i})\Delta X_{t_i} + \frac{1}{2}F''(X_{t_i})(\Delta X_{t_i})^2 + R_n(t_i),
+\end{align}
+missä $\Delta X_{t_i} = X_{t_{i+1}} - X_{t_{i}}$, $\tilde{t}_i \in (t_i, t_{i+1})$ ja ns. virhetermi $R_n(t_i) = 1/2 (F''(X_{\tilde{t}_i}) - F''(X_{t_i}))(\Delta X_{t_i})^2$.
+
+Seuraavaksi määrittelemme aputermin $\delta_n = \max_{t_i\in\tau_n, t_i \leq t}|\Delta X_{t_i}|$. Edelleen tästä seuraa 
+
+\begin{equation}\label{virhetermi}
+|R_n(t_i)|\leq \frac{1}{2} \max_{|x-y|\leq \delta_n; x,y\in X[0,t]} |F''(x) - F''(y)|(\Delta X_{t_i})^2 \leq \varepsilon_n (\Delta X_{t_i})^2
+\end{equation}
+
+jollekin positiiviselle $\varepsilon_n > 0$, sillä $F''$ on tasaisesti jatkuva $X[0,t]$:ssä. Lisäksi huomaamme, että termi $\varepsilon_n (\Delta X_{t_i})^2 \xrightarrow{\delta_n \rightarrow 0} 0.$
+
+Nyt perustelemme kaavan
+\begin{equation}\label{itotaylor}
+F(X_{t_{i+1}}) - F(X_{t_i}) = F'(X_{t_i})\Delta X_{t_i} + \frac{1}{2}F''(X_{t_i})(\Delta X_{t_i})^2 + R_n(t_i)
+\end{equation}
+termien -- paitsi Itô-integraaliksi suppenevan termin $F'(X_{t_i})\Delta X_{t_i}$ -- Riemann-summien raja-arvojen olemassaolot ja muodot, kun $n\rightarrow\infty$. Tällöin, kun otamme Riemann-summien raja-arvot kaavan \ref{itotaylor} termeistä, saamme kaavan \ref{itokaava} ja huomaamme, että jäljelle jäävä termi on Itô-integraali \ref{itoint}. 
+
+Suoraan yhtälälöstä \ref{virhetermi} näemme, että 
+\begin{equation}
+\big\vert \sum_{t\geq t_i\in\tau_n} R_n(t_i)\big\vert \leq \varepsilon_n \sum_{t\geq t_i\in\tau_n} (\Delta X_{t_i})^2 \xrightarrow{n \rightarrow \infty} 0.
+\end{equation}
+
+Seuraavaksi, koska erotus $F(X_{t_{i+1}}) - F(X_{t_i})$ on vaihteleva summa\footnote{Täsmennyksenä, vaihtelevalla summalla tarkoitamme summaa, jonka peräkkäiset termit kumoavat toisensa.}, pätee
+\begin{equation}
+\sum_{t\geq t_i\in\tau_n} F(X_{t_{i+1}}) - F(X_{t_i}) \xrightarrow{n \rightarrow \infty} F(X_t) - F(X_0). 
+\end{equation}
+Viimeiseksi huomaamme, että 
+\begin{equation}
+\sum_{t\geq t_i\in\tau_n} \frac{1}{2}F''(X_{t_i})(\Delta X_{t_i})^2 \xrightarrow{n \rightarrow \infty} \frac{1}{2}\int_0^t F''(X_s)d\langle X_s \rangle.
+\end{equation}
+Koska yhtälön kaikki muut termit suppenevat, on myös termin $\sum_{t\geq t_i\in\tau_n} F'(X_{t_i})\Delta X_{t_i}$ raja-arvon oltava olemassa. Tätä raja-arvoa kutsumme \emph{Itô-integraaliksi}, eli todistuksen viimeistelee yhteys
+\begin{equation}
+\lim_{n\rightarrow\infty} \sum_{t\geq t_i\in\tau_n} F'(X_{t_i})\Delta X_{t_i} =: \int_0^t F'(X_s)dX_s.
+\end{equation}
+\end{proof} 
+\end{lause}
+
+\subsection{Kovariaatio ja moniulotteinen Itôn lemma}
+
+Jotta voisimme ymmärtää moniulotteiseen Itôn kaavaan liittyviä termejä ja edelleen käsitellä hetken kuluttua stokastisia differentiaaliyhtälöitä, tarvitsemme muutaman lisäkäsitteen rajoittamattomasti heilahtelevien funktioiden käsittelyyn.
+
+Olkoon funktiot $X,Y\in C^0[0,\infty)$ varustettu jatkuvilla neliöheilahteluilla edellä esitellyn ositusjonon $\tau_n$ suhteen.
+
+\begin{maar}\label{kovariaatio}
+Jos raja-arvo
+\begin{equation}
+\langle X,Y \rangle_t = \lim_{n\rightarrow\infty} \sum_{t_i \in \tau_n, t_i \leq t} (\Delta X_{t_i})(\Delta Y_{t_i})
+\end{equation}
+on olemassa kaikille $t\geq 0$, niin kutsumme funktiota $t\mapsto \langle X,Y \rangle_t$\  $X$:n ja $Y$:n \emph{kovariaatioksi\footnote{Engl. \emph{Covariance}, esimerkiksi kirjassa \cite{Sondermann}. Lukijan on syytä huomata, että merkintä eroaa skalaaritulon merkinnästä alaindeksillä $t$. Kuitenkin jatkossa saatamme lyhentää kovariaation merkintää pudottamalla alaindeksin pois: näissä tapauksissa merkinnän laatu selviää kontekstista.}}.
+\end{maar}
+
+Tuemme määritelmää ja sen mielekkyyttä seuraavalla lauseella:
+
+\begin{lause}\label{polarisaatio} (Polarisaatiokaava)
+Kovariaatio $\langle X,Y \rangle$ on olemassa jos ja vain jos $\langle X+Y \rangle$ on olemassa. Tällöin
+\begin{equation}
+\langle X,Y \rangle  = \frac{1}{2}\big( \langle X+Y \rangle - \langle X \rangle - \langle Y \rangle \big).
+\end{equation}
+\begin{proof}
+Seuraa välittömästi neliöheilahtelun määritelmästä summalle $X+Y$. Edelleen, koska neliöheilahtelut ovat rajoitettuja funktioita, raja-arvo summista on olemassa summien raja-arvoina.
+\end{proof}
+\end{lause}
+
+\begin{huom}
+Kaava \ref{polarisaatio} on selvästi yhtäpitävä kaavan 
+\begin{equation}\label{polarekv}
+\langle X+Y \rangle = \langle X \rangle + \langle Y \rangle + 2\langle X,Y \rangle
+\end{equation}
+kanssa\footnote{Kaava \ref{polarekv} esiintyy yleisesti esimerkiksi rahoitusteoreettisilla sovellusalueilla. Jos funktiot $X$ ja $Y$ kuvaavat esimerkiksi johdannaisten hintakäyrää, on niiden yhteiskovariaatio suuren mielenkiinnon kohteena. Tätä lähestymistapaa esitellään esimerkiksi kirjassa \cite{Follmer}.}.
+\end{huom}
+
+Erityisesti $d$-ulotteiselle Brownin liikkeelle pätee\footnote{Tässä asiayhteydessä siis perusjoukko $\Omega = C[0,\infty)^d$. Tässä lisäksi käytämme mittana ns. \emph{Wiener-mittaa} siten, että $P=\prod_{i=1}^d P_i$ missä $P_i$ on Wiener-mitta. Wiener-mitan konstruointi ja esimerkin yhteyden olemassaolosta lisää kirjassa \cite{Bauer}.} $P$-melkein varmasti
+\begin{equation}\label{brownkov}
+\langle B^k, B^l \rangle_t = t \delta_{kl},
+\end{equation}
+missä 
+\begin{equation}
+\delta_{kl} = \begin{cases} 1, \text{ kun }k=l \\ 0, \text{ kun }  k\neq l \end{cases}.
+\end{equation}
+Yhtälö \ref{brownkov} on intuitiivinen tulos, sillä muistamme että $\langle B \rangle_t = t$.
+
+\begin{lause}\label{dito}($d$-ulotteinen Itôn kaava):
+Olkoon $F \in C^2(\mathbb{R}^d)$. Nyt\footnote{Muistutuksena lukijalle lauseessa esiintyviä vektorianalyysin merkintöjä: $\nabla F(x)$ on funktion $F$ \emph{gradientti}, $\Delta F(x)$ on funktion $F$ \emph{Laplace-operaattori} ja $dF(x)$ on skalaaritulo $(\nabla F(x),dx)$. Näistä operaattoreista lisää esimerkiksi Olli Martion klassikkoteoksessa \cite{Martio}.}
+\begin{equation}
+F(X_t) = F(X_0) + \int_0^t \nabla F(X_s) dX_s + \frac{1}{2} \sum_{k,l=1}^d \int_0^t F_{x_k,x_l}(X_s)d \langle X^k, X^l \rangle_s,
+\end{equation}
+ja raja-arvo
+\begin{equation}\label{d-itoint}
+\int_0^t \nabla F(X_s) dX_s := \lim_{n\rightarrow\infty} \sum_{t_i\in\tau_n, t_i \leq t} \big( \nabla F(X_{t_i}), (X_{t_{i+1}}-X_{t_i})\big)
+\end{equation}
+on olemassa. Erityisesti, raja-arvoa \ref{d-itoint} kutsutaan d-ulotteiseksi Itô-integraaliksi.
+
+\begin{proof}
+Lauseen todistus on täysin analoginen $1$-ulotteisen Itôn kaavan todistuksen kanssa. Ainoa ero on Taylorin kaavan $d$-ulotteisen version käyttäminen. 
+\end{proof}
+\end{lause}
+
+\begin{huom}
+Lauseen \ref{dito} Itôn kaava voidaan esittää yhtäpitävässä differentiaalimuodossa\footnote{Tätä kutsutaan kirjallisuudessa stokastisten derivaattojen ketjusäännöksi esimerkiksi lähteissä \cite{Durrett}, \cite{Sondermann} ja \cite{Oksendal}.} 
+\begin{equation}
+dF(X_t) = \big(\nabla F(X_t),dX_t \big) + \frac{1}{2}\sum_{k,l}\frac{\partial^2 F}{\partial x_k \partial x_l} (X_t)d \langle X^k, X^l \rangle_t.
+\end{equation}
+Erityisesti $d$-ulotteiselle Brownin liikkeelle $B_t = (B_t^1, \dots, B_t^d)$ pätee yhtälön \ref{brownkov} myötä
+\begin{equation}
+dF(B_t) = \big( \nabla F(B_t), dB_t \big) + \frac{1}{2}\Delta F(B_t)dt.
+\end{equation}
+\end{huom}
+
+Kuten klassisessa analyysissä, tarvitsemme myös derivaatan tulosääntöä jatkon differentiaaliyhtälöitä varten:
+
+\begin{lause}\label{tulosaantoito}(Tulosääntö Itô-analyysissä):
+Jollekin funktioille $X,Y$, joilla on jatkuvat neliöheilahtelut ja kovariaatio, pätee
+\begin{equation}
+d(XY) = XdY + YdX + d\langle X,Y \rangle.
+\end{equation}
+\begin{proof}
+Lauseen \ref{dito} merkinnöin nyt $F(X,Y)=XY$. Suoraan, kun $d=2$, saamme
+\begin{align*}
+dF(X,Y) = d(XY) %= XdY + YdX + \frac{1}{2}\sum_{X,Y}\frac{\partial^2XY}{\partial X \partial Y}d\langle X,Y \rangle \\
+&= XdY + YdX + \frac{1}{2}(1+1)d\langle X,Y \rangle \\
+&= XdY + YdX + d\langle X,Y \rangle.
+\end{align*}
+\end{proof}
+\end{lause}	
+
+Määrittelemme nyt erään tärkeän kokoelman stokastisten differentiaaliyhtälöiden ja Itô-integraalien käyttöön: 
+
+\begin{maar}\label{hookaks}
+Sanomme kokoelmaa $H^2$ kokoelmaksi progressiivisesti mitallisia prosesseja $\phi$, joille pätee\footnote{Huomautuksena, että voimme yleistää kokoelman $H^2$ kokoelmaksi $H^\alpha$ koskemaan myös jotakin integrandin korkeampaa potenssia $\alpha > 2$.} $E(\int_0^T |\phi_t|^2dt)<\infty $.
+\end{maar}
+
+Ennen kuin siirrymme tarkastelemaan stokastisia differentiaaliyhtälöitä, määrittelemme vielä Itô-integraalin yleiselle integrandille $f(t,\omega) = F'(t,\omega)\in H^2$. 
+
+\subsection{Yleinen Itô-integraali}
+
+Käymme nyt perusteellisesti läpi yleisen Itô-integraalin määrittelyn ja olemassaolon sekä \emph{Itô-isometrian} aputuloksen. Käytämme olemassaolon perustelemiseen kirjallisuudessa -- esimerkiksi lähteissä \cite{Oksendal}, \cite{Gasbarra} ja \cite{Chung} -- esiintyvää taktiikkaa\footnote{Muistutuksena lukijalle, että käytimme samanlaista lähestymistapaa Lebesgue-integraalin \ref{lebesgue_diskr} määrittelemisessä.}, jossa perustelemme integraalin olemassaolon ja Itô-isometrian aluksi yksinkertaisille funktioille, jonka jälkeen laajennamme käsitteen yleisille funktioile $f\in H^2$. 
+
+Haluamme nyt määritellä muotoa 
+\begin{equation}\label{itoint_yleinen}
+I(f,\omega) = \int_S^T f(t,\omega) d B_t(\omega)
+\end{equation}
+olevan Itô-integraalin ja perustella sen olemassaolon yleiselle integrandille $f(t,\omega)\in H^2$. Vastaavasti kuten määritelmässä \ref{lebesgue_diskr}, olkoon $X\in H^2$ \emph{yksinkertainen funktio}
+\begin{equation}\label{yksinkert_ftio}
+X=\sum_i \alpha_i(\omega)\mathbf{1}_{[t_i,t_{i+1})}(t).
+\end{equation} 
+Lisäksi koska $X \in H^2$, täytyy jokaiselle $\alpha_i$ päteä $\alpha_i \in \mathcal{F}_t$. Nyt voimme määritellä integraalien \ref{d-itoint} ja \ref{itoint} hengessä Itô-integraalin 
+\begin{equation}\label{itoint_yksink}
+\int_S^T X(t,\omega)dB_t(\omega) =  \sum_{i\leq 0} \alpha_i(\omega)(B_{t_{i+1}}-B_{t_i})(\omega)
+\end{equation}
+yksinkertaiselle integrandille $X\in H^2$. Seuraavaksi esittelemme ja todistamme tärkeän Itô-analyysin tuloksen, \emph{Itô-isometrian}, yksinkertaisille funktioille $X$:
+
+\begin{lem}\label{itoisom_yksink}(Itô-isometria yksinkertaisille funktioille):
+Jos $X(t,\omega)$ on rajoitettu ja yksinkertainen funktio, niin
+\begin{equation}
+E\biggl( \biggl(\int_S^T X(t,\omega)dB_t(\omega) \biggr)^2 \biggr) = E\biggl( \int_S^T X(t,\omega)^2 \biggr).
+\end{equation}
+\begin{proof}
+Olkoon $\Delta B_i = B_{t_{i+1}}-B_{t-i}$. Koska $\alpha_i \alpha_j \Delta B_i$ ja $\Delta B_j$ ovat riippumattomia kun $i > j$, niin 
+\begin{equation}
+E(\alpha_i \alpha_j \Delta B_i \Delta B_j) = \begin{cases} 0, \text{ kun } i\neq j , \\E(\alpha^2_i)(t_{i+1}-t_i), \text{ kun } i=j \end{cases},
+\end{equation}
+ja edelleen merkintöjä lyhentäen
+\begin{equation*}
+E\biggl(\biggl( \int_S^T X_t dB_t \biggr)^2 \biggr) = \sum_{i,j} E(\alpha_i \alpha_j \Delta B_i \Delta B_j) = \sum_j E(\alpha^2_i)(t_{i+1}-t_i) = E\biggl( \int_S^T X_t^2 d B_t \biggr).
+\end{equation*}
+\end{proof}
+\end{lem}
+Nyt kun olemme määritelleet Itô-integraalin yksinkertaisille funktioille $X$ ja osoittaneet Itô-isometrian näille funktioille, yleistämme Itô-integraalin määritelmän. Kuten kirjassa \cite{Oksendal}, esittelemme ja todistamme kolme lemmaa, joiden avulla määrittelemme yleisen integraalin askel askeleelta.
+
+\begin{lem}\label{Ito_askel1}(Ensimmäinen askel):
+Olkoon funktio $g\in H^2$ rajoitettu ja $g(\cdot,\omega)$ jatkuva kaikilla $\omega$. Tällöin on olemassa sellaiset yksinkertaiset funktiot $X_n \in H^2$, joille pätee
+\begin{equation}
+E\biggl( \int_S^T (g-X_n)^2 dt\biggr) \xrightarrow{n\rightarrow\infty} 0.
+\end{equation}
+\begin{proof}
+Koska $g\in H^2$, määrittelemme yksinkertaisiksi funktioiksi $X_n(t,\omega) = \sum_i g(t_i,\omega)\mathbf{1}_{[t_i,t_{i+1})}(t)$. Nyt funktion $g$ jatkuvuudesta seuraa raja-arvo
+\begin{equation}
+\int_S^T (g-X_n)^2 dt \xrightarrow{n\rightarrow\infty} 0
+\end{equation}
+ja väite seuraa tästä edelleen dominoivan konvergenssin lauseella\footnote{Lebesguen dominoivan konvergenssin lause voidaan yleistää $L^p$-avaruuksiin. Jos jono $f_n$ suppenee $P$-melkein varmasti kohti $\mathcal{F}_t$-mitallista funktiota $f$ ja on olemassa funktio $g\in L^p$, joka dominoi jonoa $f_n$, niin tällöin $f_n\rightarrow f$ $L^p$-mielessä. Lisää esimerkiksi lähteestä \cite{Williams}}, kun $n\rightarrow\infty$.
+\end{proof}
+\end{lem}
+
+\begin{lem}\label{Ito_askel2}(Toinen askel):
+Olkoon nyt $h\in H^2$ rajoitettu. Tällöin on olemassa rajoitetut funktiot $g_n\in H^2$ siten, että $g_n(\cdot,\omega)$ on jatkuva kaikilla $\omega$ ja $n$ ja 
+\begin{equation}
+E\biggl( \int_S^T (h-g_n)^2 dt\biggr)\xrightarrow{n\rightarrow\infty} 0.
+\end{equation}
+\begin{proof}
+Oletetaan, että kaikille $t,\omega$ pätee $|h(t,\omega)| \leq M$ jollakin ''tarpeeksi isolla'' reaaliluvulla $M$, ja olkoon jokaista luonnollista lukua $n$ kohti $\phi_n$ positiivinen ja jatkuva funktio avaruudessa $\mathbb{R}$, jolle pätee
+\begin{enumerate}[a)]
+\item $\phi_n(x) = 0$, jos $x\leq -1/n$ tai $x\geq 0$ ja
+\item $\int_\mathbb{R} \phi_n(x)dx = 1$.
+\end{enumerate}
+Määritellään 
+\begin{equation}
+g_n(t,\omega) = \int_0^t \phi_n(s-t)h(s,\omega)ds,
+\end{equation}
+ja selvästi nyt $g_n$ on jatkuva kaikilla $\omega$ ja lisäksi $|g_n|\leq M$. Edelleen jokaiselle $\omega$ pätee
+\begin{equation}
+\int_S^T (g_n(s,\omega)-h_n(s,\omega))^2 ds \xrightarrow{n\rightarrow\infty} 0
+\end{equation}
+ja kuten yllä, dominoivan konvergenssin lause viimeistelee todistuksen.
+\end{proof}
+\end{lem}
+
+\begin{lem}\label{Ito_askel3}(Kolmas askel):
+Olkoon $f\in H^2$. Tällöin on olemassa jono $\{h_n \} \subset H^2$, jossa $h_n$ on rajoitettu jokaiselle $n$ ja lisäksi 
+\begin{equation}
+E\biggl( \int_S^T(f-h_n)^2 dt \biggr) \xrightarrow{n\rightarrow\infty} 0.
+\end{equation}
+\begin{proof}
+Jos valitsemme funktioksi $h_n$ paloittain määritellyn funktion
+\begin{equation}
+h_n(t,\omega) = \begin{cases} -n, \text{ jos } f < -n, \\ f(t,\omega), \text{ jos } -n\leq f \leq n, \\ n, \text{ jos } f > n \end{cases},
+\end{equation}
+niin väite seuraa suoraan dominoivan konvergenssin lauseesta.
+\end{proof}
+\end{lem}
+
+Nyt kun olemme määrittäneet kolme lemmaa avuksi, voimme vihdoin määritellä Itô-integraalin \ref{itoint_yleinen}. Jos $f\in H^2$, niin lemmojen \ref{Ito_askel1}, \ref{Ito_askel2} ja \ref{Ito_askel3} perusteella valitsemme yksinkertaiset funktiot $X_n\in H^2$ niin, että 
+\begin{equation}
+E\biggl( \int_S^T |f-X_n|^2 dt \biggr) \xrightarrow{n\rightarrow\infty} 0.
+\end{equation}
+Tämän jälkeen määrittelemme Itô-integraalin raja-arvona
+\begin{equation}
+I(f)(\omega) := \int_S^T f(t,\omega) dB_t(\omega) = \lim_{n\rightarrow\infty} \int_S^T X_n(t,\omega)dB_t(\omega).
+\end{equation}
+Tämä raja-arvo on olemassa avaruudessa $L^2(P)$, sillä Itô-isometrian \ref{itoisom_yksink} mukaan jono 
+\begin{equation}
+\left\lbrace \int_S^T X_n(t,\omega)dB_t(\omega) \right\rbrace_{n\in\mathbb{N}} 
+\end{equation}
+on \emph{Cauchy}\footnote{Sanomme, että jono $X_n$ on \emph{Cauchy}, jos jokaista lukua $\varepsilon>0$ kohti voidaan valita sellainen luonnollinen luku $n$, että $|a_{n+p}-a_n|<\varepsilon $ kaikilla $p>0$.} avaruudessa $L^2(P)$. Näin ollen seuraava määritelmä on perusteltu, ja sen esittelemä Itô-integraali on olemassa raja-arvona:
+
+\begin{maar}\label{itoint_yleinen_maar}(Yleinen Itô-integraali):
+Olkoon $f\in H^2(S,T)$. Nyt integrandin $f$ Itô-integraali määritellään raja-arvona\footnote{Huomautuksena, että jono $\{X_n\}$ todella on olemassa lemmojen \ref{Ito_askel1} - \ref{Ito_askel3} nojalla. Lisäksi, Itô-isometriasta \ref{itoisom_yksink} seuraa yleisen integraalin olemassaolo, eikä raja-arvo riipu funktion $X$ valinnasta.}
+\begin{equation}\label{Itoint}
+\int_S^T f(t,\omega)dB_t(\omega) = \lim_{n\rightarrow\infty} \int_S^T X_n(t,\omega) dB_t(\omega),
+\end{equation}
+missä $\{X_n \}_{n\in\mathbb{N}}$ on jono yksinkertaisia funktioita, mille pätee
+\begin{equation}
+E\biggl( \int_S^T (f(t,\omega)-X_n(t,\omega))^2 dt \biggr) \xrightarrow{x\rightarrow\infty} 0. 
+\end{equation}
+\end{maar}
+
+Lisäksi suoraan määritelmästä seuraa yleistys Itô-isometrialle \ref{itoisom_yksink}:
+
+\begin{lause}\label{itoisom_yleinen}(Itô-isometria):
+Kaikilla $f\in H^2(S,T)$ Itô-integraaleille \ref{Itoint} pätee
+\begin{equation}
+E\biggl( \biggl(\int_S^T f_t(\omega)dB_t(\omega) \biggr)^2 \biggr) = E\biggl( \int_S^T f_t(\omega)^2 \biggr).
+\end{equation}
+\begin{proof}
+Seuraa välittömästi Itô-isometriasta yksinkertaisille funktioille \ref{itoisom_yksink} ja yleisen Itô-integraalin määrittävästä raja-arvosta \ref{Itoint}.
+\end{proof}
+\end{lause}
+
+Nyt kun olemme viimein määritelleet tutkielman laajuuteen sopivan Itô-integraalin, määrittelemme vielä muutaman tärkeän tuloksen niihin liittyen. Niin kutsuttua \emph{martingaaliesityslausetta}\footnote{Termi tunnettu englanninkielisessä kirjallisuudessa nimellä \emph{Martingale representation theorem}, esimerkiksi Øksendalissa \cite{Oksendal}.} käytetään monissa Brownin liikkeeseen liittyvissä todistuksissa, ja se on esimerkiksi takaperäisten stokastisten differentiaaliyhtälöiden erikoistapaus\footnote{Tästä lisää kappaleessa \ref{tsdyluku}.}. Martingaaliesityslauseen todistamisen mahdollistamiseksi esitämme alkuun erään toisen mielenkiintoisen lauseen: 
+
+\begin{lause}\label{itoesitys}(Itôn esityslause)
+Olkoon $F\in L^2(\mathcal{F}_T^n,P)$. Tällöin on olemassa yksikäsitteinen stokastinen prosessi $f(t,\omega) \in H^2$, jolle pätee 
+\begin{equation}\label{itoesitysyhtalo}
+F(\omega) = E(F) + \int_0^T f(t,\omega) dB_t.
+\end{equation}
+\begin{proof}
+Typistääksemme tutkielman laajuutta, jätämme todistuksen maineikkaaseen Øksendalin kirjaan \cite{Oksendal}, sivulta 51 alkaen. 
+\end{proof}
+\end{lause}
+
+\begin{lause}\label{martingaaliesitys}(Martingaaliesityslause):
+Olkoon $B_t$ $d$-ulotteinen Brownin liike. Oletetaan lisäksi, että $M_t$ on $\mathcal{F}_t^n$-martingaali mitan $P$ suhteen, ja että $M_t\in L^2$ kaikille $t\geq 0$. Tällöin on olemassa yksikäsitteinen stokastinen prosessi $g(s,\omega)\in H^2$ kaikille $t\geq 0$, jolle pätee 
+\begin{equation}
+M_t(\omega) = E(M_0) + \int_0^t g(s,\omega)dB_s
+\end{equation}
+$P$-melkein varmasti kaikille $t\geq 0$.
+
+\begin{proof}
+Koska Itôn integraali kaavassa \ref{itoesitysyhtalo} on neliöintegroituva ja siten martingaali, seuraa suoraan Itôn esityslauseesta \ref{itoesitys} martingaaliesityslause. Todistamme kuitenkin tämän lauseen myös vaihtoehtoisesti tapauksessa $n=1$:
+
+Lauseen \ref{itoesitys} mukaan kaikille $t\geq 0$ on olemassa yksikäsitteinen $\mathcal{F}$-sopiva prosessi $f(s,\omega)\in L^2(\mathcal{F}_t,P)$, jolle
+\begin{equation}
+M_t(\omega) = E(M_t) + \int_0^t f(s,\omega)dB_s(\omega) = E(M_0) + \int_0^t f(s,\omega)dB_s(\omega).
+\end{equation} 
+Nyt, olkoon $0 \leq t_1 < t_2$. Edelleen
+\begin{align}
+M_t &= E(M_{t_2}|\mathcal{F}_{t_1}) = E(M_0) + E\big(\int_0^{t_2}f^{t_2}(s,\omega)dB_s | \mathcal{F}_{t_1}\big) \nonumber \\ &= E(M_0) + \int_0^{t_1} f^{t_2}(s,\omega)dB_s.
+\end{align}
+Toisaalta --  myös lauseen \ref{itoesitys} mukaan -- pätee  
+\begin{equation}
+M_{t_1} = E(M_0) + \int_0^{t_1}f^{t_1}(s,\omega)dB_s.
+\end{equation}
+Vertailemalla viimeisimpää kahta ylläolevaa yhtälöä, saamme pääteltyä yhteyden
+\begin{equation}
+E((\int_0^{t_1}(f^{t_2}-f^{t_1})dB)^2) = \int_0^{t_1}E((f^{t_2}-f^{t_1})^2)ds,
+\end{equation}
+ja edelleen 
+\begin{equation}
+f^{t_1}(s,\omega) = f^{t_2}(s,\omega)
+\end{equation}
+melkein kaikille $(s,\omega)\in [0,t_1] \times \Omega$. Nyt voimme siis määritellä yksikäsitteisen $\mathcal{F}$-sopivan prosessin $g(s,\omega)$ melkein kaikille $(s,\omega)\in [0,t_1]\times\Omega$ asettamalla $g(s,\omega) = f^N(s,\omega)$ jos $s\in[0,N]$. Viimein saamme todistuksen valmiiksi toteamalla yhtälön
+\begin{equation}
+M_t = E(M_0) + \int_0^t f^t(s,\omega)dB_s(\omega) = E(M_0) + \int_0^t g(s,\omega)dB_s(\omega). 
+\end{equation}
+\end{proof}
+\end{lause}
+
+Kuten aiemmin martingaalien esittelyn yhteydessä mainitsimme, martingaaleihin liittyy olennaisesti myös niin sanottu Girsanovin lause. Girsanovin lausetta käytetään laajasti stokastisten differentiaaliyhtälöiden teorian aputuloksena, ja se nitoo kätevästi yhteen neliöheilahtelun ja martingaalien käsitteet. 
+
+\begin{lause}\label{Girsanov} (Girsanovin lause):
+Olkoon mitta $Q$ absoluuttisesti jatkuva\footnote{Muistutuksena lukijalle, että mittojen sanotaan olevan ekvivalentit, jos ja vain jos mitat ovat \emph{absoluuttisesti jatkuvia} toistensa suhteen. Edelleen, mielivaltainen Borel-joukkojen mitta $\mu$ on absoluuttisesti jatkuva \emph{Lebesgue-mitan} $\lambda$ suhteen, jos jokaista mitallista joukkoa $A$ kohden pätee $\lambda(A) \Rightarrow \mu(A)$. Jos mitat ovat ekvivalentit, merkitsemme $\mu \sim \lambda$.} mitan $P$ suhteen ja niiden Radon-Nikodymin derivaatta\footnote{Muistutuksena: Radon-Nikodymin derivaataksi kutsutaan sellaista funktiota $Z=dQ/dP\in L^1(\Omega,\mathcal{F}^\infty)$, jolle kaikilla $A\in\mathcal{F}^\infty$ pätee $Q(A)=\int_A Z(\omega)P(d\omega)$ jos $Q\sim P$. Lisää aiheesta esimerkiksi kirjassa Durrett \cite{Durrett}.} $Z = dQ/dP$. Nyt jos $M$ on jatkuva martingaali mitan $P$ suhteen, niin
+\begin{equation}
+\widetilde{M}_t := M_t - \int_0^t \frac{1}{Z_s} d \langle M,Z \rangle_s
+\end{equation}
+on jatkuva martingaali mitan $Q$ suhteen.
+
+Edelleen, jos mitat $P$ ja $Q$ ovat ekvivalentteja, $Q = \mathcal{E}(L)P$\footnote{Kirjallisuudessa kutsutaan termiä $\mathcal{E}(L) = \exp\{L - 1/2 \langle L \rangle \}$ \emph{stokastiseksi eksponentiksi}.} ja $M$ kuten yllä, niin
+\begin{equation}
+\widetilde{M} = M - \langle M,L \rangle
+\end{equation}
+on jatkuva martingaali mitan $Q$ suhteen, ja edelleen
+\begin{equation}
+P_t = \mathcal{E}(-\widetilde{L})_t Q_t.
+\end{equation}
+
+\begin{proof}
+Todistamme lauseen ensimmäisen osan, jossa riittää osoittaa että $\widetilde{M}Z$ on jatkuva martingaali $P$:n suhteen.
+
+\begin{align*}
+\widetilde{M}_tZ_t &= \widetilde{M}_0Z_0 + \int_0^t \widetilde{M}_s dZ_s + \int_0^t Z_s d\widetilde{M}_s + \langle \widetilde{M},Z \rangle_s \\
+&= \widetilde{M}_0Z_0 + \int_0^t \widetilde{M}_s dZ_s + \int_0^t Z_s dM_s - \langle M,Z \rangle_t + \langle \widetilde{M},Z \rangle_s,
+\end{align*}
+joista viimeinen termi on nolla koska $\widetilde{M} - M \in FV$, ja muut termit ovat selvästi martingaaleja mitan $P$ suhteen.
+\end{proof}
+\end{lause}
+
+Nyt olemme esitelleet Itô-integraalit ja niihin liittyviä ydintuloksia. Jatkamme luontevasti kohti stokastisia differentiaaliyhtälöitä, missä Itô-integraalia käytetään prosessin satunnaisheilahtelun mallintamisessa yhdessä tavanomaisen Lebesguen integraalin kanssa.
+	
+\section{Stokastisten differentiaaliyhtälöiden perusteet}
+
+Stokastisia differentiaaliyhtälöitä on tutkittu aikaisimmillaan Einsteinin kuuluisassa artikkelikokelmassa Annus Mirabilis Annalen der Physik -lehteen vuonna 1905 \cite{Einstein}. Einsteinin alustavan työn jälkeen stokastisten differentiaaliyhtälöiden teoriaa jatkoi pääasiassa Paul Langevin (1872-1946), kunnes hieman myöhemmin vanha tuttumme Itô ja Ruslan Stratonovich (1930-1997) muokkasivat yhtälöiden teoriaa nykyistä muotoa vastaavaksi.
+
+Tässä kappaleessa esittelemme lyhyesti etuperäiset eli tavanomaiset stokastiset differentiaaliyhtälöt luonnollisena alkuna takaperäisten stokastisten differentiaaliyhtälöiden käsittelylle. Kappale pohjautuu kirjoihin \cite{Oksendal} ja \cite{Touzi}. Käymme läpi stokastisten differentiaaliyhtälöiden ratkaisun olemassaolo- ja yksikäsitteisyyslauseen ja lisäksi esittelemme näiden yhtälöiden \emph{markoviaanisen ominaisuuden}.
+
+Edellisen kappaleen perusteella käsittelemme differentiaaliyhtälöitä todennäköisyysavaruudessa $(\Omega, \mathcal{F},P,\{ \mathcal{F}\}_{t\geq 0})$. Lisäksi olkoon $B_t = \{ B_t, t\leq 0 \}$ $d$-ulotteinen $\mathcal{F}_t$-Brownin liike. Käsittelemme tässä kappaleessa sellaisia stokastisia differentiaaliyhtälöitä (lyh. SDY), jotka ovat muotoa 
+\begin{equation}\label{sdy}
+dX_t = b_t(X_t)dt + \sigma_t(X_t)dB_t,
+\end{equation}
+missä $t\in[0,T]$ ja edelleen $T$ on annettu maturiteetti- tai terminaaliaika. Lisäksi $b$ ja $\sigma$ ovat $\{ \mathcal{F}\}_{t\geq 0} \otimes \mathcal{B}(\mathbb{R}^n)$-progressiivisesti mitallisia funktioita, joissa lähtöjoukkona toimii $[0,T] \times \Omega \times \mathbb{R}^n$, maalijoukkona $b$:ssä toimii $\mathbb{R}^n$ ja $\sigma$:ssa $\mathbb{R}^{n\times d}$. Erityisesti, jokaiselle kiinnitetylle $x\in\mathbb{R}^n$ prosessit $\{ b_t(x,\omega), \sigma_t(x,\omega), t\in [0,T]\}$ ovat $\{ \mathcal{F}\}_{t\geq 0}$-progressiivisesti mitallisia. Heuristisesti yhtälöä \ref{sdy} voi tulkita siten, että jokaista pientä ajanhetkeä $\varepsilon$ kohden prosessin $X_t$ muutos on normaalisti jakautunutta liikettä odotusarvolla $\mu_t \varepsilon$ ja varianssilla $\sigma_t^2 \varepsilon$. Prosessia $X_t$ kutsutaan kirjallisuudessa joskus myös \emph{diffuusioprosessiksi} \cite{Oksendal}.
+
+\begin{maar}\label{sdyratk}
+Kutsumme stokastisen differentiaaliyhtälön \ref{sdy} \emph{vahvaksi ratkaisuksi}\footnote{Lukijan on syytä huomioida, että yhtälölle \ref{sdy} on olemassa myös \emph{heikkoja ratkaisuja}. Näiden ero on pääsääntöisesti se, että vain määritelmän mukaiset vahvat ratkaisut ovat määritelty kaikkialla avaruudessa $(\Omega, \mathcal{F},P,\{ \mathcal{F}\}_{t\geq 0},B_t)$.} sellaista $\{ \mathcal{F}\}_{t\geq 0}$-progressiivisesti mitallista prosessia $X$, jolle
+\begin{equation}
+\int_0^T (|b_t(X_t)| + |\sigma_t(X_t)|^2)dt < \infty
+\end{equation}
+$P$-melkein varmasti, ja lisäksi
+\begin{equation}
+X_t = X_0 + \int_0^t b_s(X_s)ds + \int_0^t \sigma_s(X_s)dB_s
+\end{equation}
+missä $t\in[0,T]$.
+\end{maar}
+
+\subsection{Olemassaolo- ja yksikäsitteisyyslause sekä markoviaaninen ominaisuus}
+
+Ratkaisun \ref{sdyratk} olemassaolo ja yksikäsitteisyys on myös todistettavissa. Esittelemme ja todistamme tuloksen niin kutsutulla kutistusperiaatteella kirjan \cite{Touzi} mukaisesti. Olemassaolo- ja yksikäsitteisyyslause stokastisille differentiaaliyhtälöille on yksi tärkeimpiä tuloksia alalla. Tuloksen todistuksen jälkeen -- ennen siirtymistä takaperäisiin stokastisiin differentiaaliyhtälöihin tutkielman pääaiheena -- esittelemme lyhyesti stokastisten differentiaaliyhtälöiden Markoviaanisen ominaisuuden kirjan \cite{Touzi} mukaisesti
+
+\begin{lause}\label{sdyolemasssaolo}Oletetaan, että $X_0 \in L^2$ on satunnaismuuttuja, jolle $X_0 \indept B_t$ ja että $b_t(0), \sigma_t(0) \in H^2$, ja jollekin $K>0$ pätee\footnote{Tätä ominaisuutta kutsutaan yleisemmin \emph{Lipschitz-jatkuvuudeksi}.} 
+\begin{equation}
+|b_t(x) - b_t(y)| + |\sigma_t(x) - \sigma_t(y) | \leq K|x-y|
+\end{equation}
+kaikille $t\in[0,T], x, y \in \mathbb{R}^n$.
+
+Nyt jokaista $T>0$ kohti yhtälölle \ref{sdy} on olemassa vahva ratkaisu $H^2$:ssa. Edelleen
+\begin{equation}
+E(\sup_{t\leq T}|X_t|^2) \leq C(1+E(X_0)^2)e^{CT}
+\end{equation}
+jollekin vakiolle $C = C(T,K)$.
+
+\begin{proof}
+Todistamme lauseen käyttämällä niin sanottua \emph{kutistusperiaatetta}, ja aloitamme seuraamalla kirjan \cite{Touzi} esimerkkiä ja esittelemme normin
+\begin{equation}
+||\phi||_{H^2_c} := E \biggl( \int_0^t e^{-ct}|\phi_t|^2 dt\biggr)^\frac{1}{2}
+\end{equation}
+jollekin vakiolle $c>0$ ja jokaiselle $\phi\in H^2$. Selvästi normit $||.||_{H^2_c}$ ja $||.||_{H^2}$ ovat ekvivalentteja\footnote{Kutsumme kahta normia $||.||_a$ ja $||.||_b$ ekvivalentiksi jos on olemassa sellaiset reaaliluvut $A$ ja $B$, että kaikille $\phi\in H^2$ pätee $A||\phi||_a \leq ||\phi||_b \leq B||\phi||_a$.} avaruudessa $H^2$. Nyt määrittelemme avaruudessa $H^2$ kuvauksen
+\begin{equation}
+U(X)_t = X_0 + \int_0^t b_s(X_s)ds + \int_0^t \sigma_s(X_s) dB_s,
+\end{equation}
+$0\leq t \leq T$. Suoraan $b$:n ja $\sigma$:n Lipschitz-ominaisuudesta ja oletuksesta $b_.(0),\sigma_.(0)\in H^2$ seuraa kuvauksen olemassaolo $H^2$:ssa. Huomaamme, että yhtälön \ref{sdy} ratkaisun olemassaolo ja yksikäsitteisyys on todistettu, jos $U(X)\in H^2$ kaikilla $X\in H^2$, ja edelleen jos $U$ on kutistus\footnote{Sanomme, että rajoitettu kuvaus $T:X\mapsto Y$ on \emph{kutistus}, jos sen operaattorinormille pätee $||T|| \leq 1$.} normin $||.||_{H^2_c}$ suhteen sopivalle vakiolle $c$. Osoittaaksemme ehdon $U(X)\in H^2$,	huomaamme että $U$ on ylhäältä rajoitettu:
+\begin{equation}\label{sdy_hajotelma-arvio}
+||U(X)||_{H^2}^2 \leq 3T||X_0||_{L^2}^2 + 3TE\biggl( \int_0^t \left|\int_0^t b_s (X_s) ds\right|^2 dt \biggr) + 3E\biggl( \int_0^t \left|\int_0^t \sigma_s (X_s dB_s)\right|^2 dt  \biggr). 
+\end{equation}
+Nyt prosessien $b$ ja $\sigma$ Lipschitz-jatkuvuudesta $x$:n suhteen ja tasaisesta jatkuvuudesta $t$:n suhteen seuraa $|b_t(x)|^2\leq K(1+|b_t(0)|^2+|x|^2)$ jollekin vakiolle $K$, ja edelleen saamme rajoitettua toisen termin
+\begin{equation}
+E\biggl( \int_0^t \left|\int_0^t b_s (X_s) ds\right|^2 dt \biggr) \leq KTE\biggl( \int^T_0 (1+|b_t(0)|^2+|X_s|^2 ds)\biggr) < \infty 
+\end{equation}
+sillä $X\in H^2$ ja $b(.,0)\in L^2(0,T)$.
+
+Käyttämällä prosessin $\sigma$ Lipschitz-jatkuvuudesta seuraavaa ominaisuutta $|\sigma_t(x)|^2 \leq K(1+|\sigma_t(0)|^2+|x|^2)$ yhdessä Doobin epäyhtälön \ref{Doob} kanssa arvioimme kolmatta termiä
+\begin{align*}
+E\biggl( \int_0^t \left|\int_0^t \sigma_s (X_s dB_s)\right|^2 dt  \biggr) &\leq TE\biggl( \max_{t\leq T} \left| \int_0^t \sigma_s(X_s)dB_s \right|^2 dt \biggr) \\
+&\leq 4TE\biggl( \int_0^T |\sigma_s(X_s)|^2 ds\biggr) \\
+&\leq 4TKE\biggl( \int_0^T (1+|\sigma_s(0)|^2 + |X_s|^2)ds\biggr) < \infty,
+\end{align*}
+ja nyt kaikki ylärajan \ref{sdy_hajotelma-arvio} termit ovat olemassa avaruudessa $H^2$:ssa, jolloin $U(X)\in H^2$. Nyt osoitamme kuvauksen olevan kutistus jollekin vakiolle $c$. Olkoon nyt $X,Y\in H^2$, joille $X_0=Y_0$. Nyt arvioimme 
+\begin{align*}
+E(|U(X)_t - U(Y)_t|)^2 & \leq 2E\left| \int_0^t (b_s(X_s)-b_s(Y_s))ds\right|^2 + 2E\left| \int_0^t (\sigma_s(X_s) - \sigma_s(Y_s))dB_s\right|^2 \\
+& = 2E\left| \int_0^t (b_s(X_s)-b_s(Y_s))ds\right|^2 + 2E\int_0^t |\sigma_s(X_s) - \sigma_s(Y_s)|^2 ds \\
+& \leq 2tE\int_0^t |b_s(X_s) - b_s(Y_s)|^2 ds + 2E\int_0^t |\sigma_s(X_s) - \sigma_s(Y_s)|^2 ds \\
+& \leq 2(T+1)K \int_0^t E|X_s - Y_s|^2 ds.
+\end{align*}
+Tästä seuraa, että 
+\begin{align*}
+||U(X)-U(Y)||_c \leq \frac{2K(T+1)}{c}||X-Y||_c,
+\end{align*}
+joten $U$ on kutistus, kun $c$ on riittävän iso.
+
+Seuraavaksi todistamme lauseen ylärajaosan käyttämällä Doobin epäyhtälöä ja suoraan arvioimalla
+\begin{align*}
+E\biggl( \sup_{u\leq t} |X_u|^2 \biggr) & = E\biggl( \sup_{u\leq t} \left|X_0 + \int_0^u b_s(X_s)ds + \int_0^u \sigma_s(X_s) dB_s \right|^2 \biggr) \\
+& \leq 3\biggl( E|X_0|^2 + tE\big( \int_0^t |b_s(X_s)|^2 ds \big) + E\big( \sup_{u\leq t} \left| \int_0^u \sigma_s(X_s) dB_s \right|^2 \big) \biggr) \\
+& \leq 3\biggl( E|X_0|^2 + tE\big( \int_0^t |b_s(X_s)|^2 ds \big) + 4E\big( \int_0^u |\sigma_s(X_s)|^2 dB_s \big) \biggr).
+\end{align*}
+Edelleen, koska prosessit $b$ ja $\sigma$ ovat Lipschitz-jatkuvia $x$:n suhteen ja tasaisesti jatkuvia $t$:n ja $\omega$:n suhteen, niin 
+\begin{equation}
+E\biggl( \sup_{u\leq t} |X_u|^2 \biggr) \leq C(K,T)\big( 1+E(X_0)^2 + \int_0^t E \biggl( \sup_{u\leq t} |X_u|^2 \big) ds \biggr)
+\end{equation}
+ja edelleen Grönwallin lemman\footnote{Grönwallin (nimetty Thomas Grönwallin 1919 tuloksen mukaan) lemma tai epäyhtälö sanoo, että jos $v(t)$ on positiivinen funktio, jolle $v(t)\leq C + A\int_0^t v(s)ds$ kaikille $0\leq t\leq T$ ja jollekin vakioille $C$ ja $A$, niin tällöin $v(t)\leq C \exp\{At\}$.} mukaan
+\begin{align*}
+E\biggl( \sup_{u\leq t} |X_u|^2 \biggr) & \leq C(K,T)\big( 1+E(X_0)^2 + \int_0^t E \biggl( \sup_{u\leq t} |X_u|^2 \big) ds \biggr) \\
+& \leq C(K,T)(1+E(|X_0|)^2)e^{C(K,T)T},
+\end{align*}
+mikä oli haluttu arvio.
+\end{proof}
+\end{lause}
+
+Jos oletamme, että funktiot $b_t(x)=b(t,x)$ ja $\sigma_t(x) = \sigma(t,x)$ ovat deterministisiä funktioita, jotka ovat Lipschitz-jatkuvia $x$:n suhteen ja tasaisesti jatkuvia $t$:n suhteen niin voimme päätellä lisää ominaisuuksia yhtälön \ref{sdy} ratkaisulle. Esittelemme nyt niin kutsutun \emph{vahvan Markoviaanisen ominaisuuden} stokastisten differentiaaliyhtälöiden ratkaisulle. 
+
+Olkoon $X^{t,x}_s$ differentiaaliyhtälön
+\begin{equation}
+X_s^{t,x} = x + \int_t^s b_u(x,X^{t,x}_u)du + \int_t^s \sigma_u(x,X^{t,x}_u)dB_u,
+\end{equation}
+$s\geq t$, vahva ratkaisu. Selvästi nyt 
+\begin{equation}
+X_s^{t,x} = F(t,x,s,(B-B_t)_{t \leq u \leq s})
+\end{equation}
+jollekin deterministiselle funktiolle $F$. Lisäksi, koska Brownin liike ja sitä kautta stokastisen differentiaaliyhtälön \ref{sdy} ratkaisu ovat poluiltaan yksikäsitteiset, pätee jokaiselle $t\leq u \leq s$
+\begin{equation}\label{hassusdyominaisuus}
+X_s^{t,x} = X_s^{u,X_u^{t,x}}.
+\end{equation}
+Yhtälö \ref{hassusdyominaisuus} pätee myös silloin, kun $u$ on pysähdysaika. Näillä heuristisilla päätelmillä perustelemme seuraavan lauseen.
+
+\begin{lause} (Vahva markoviaaninen ominaisuus):
+Kaikille pysähdysajoille $\tau$, jotka saavat arvoja välillä $(0,s)$, pätee
+\begin{equation}
+E(\Phi (X_u, \tau \leq u \leq s) | \mathcal{F}_\tau) = E(\Phi (X_u, \tau \leq u \leq s) | X_\tau)
+\end{equation}
+kaikille rajoitetuille funktioille $\Phi : C([\tau,s]) \mapsto \mathbb{R}$.
+
+\begin{proof}
+Tyydymme tässä vaiheessa tutkielmaa ylläolevaan heuristiseen johtamiseen.
+\end{proof}
+\end{lause}
+
+Seuraavaksi siirrymme takaperäisten stokastisten differentiaaliyhtälöiden käsittelyyn. Intuitio ja yhtälön muodostuminen toimivat näissä yhtälöissä vastaavasti kuin etuperäisissä stokastisissa differentiaaliyhtälöissä -- jopa ratkaisun olemassaolo- ja yksikäsitteisyyslause todistetaan samalla periaatteella -- mutta sovelluskohteet ovat erilaisia ja yhtälön määritelmän mielekkyys pitää perustella filtraation $\mathcal{F}_t$ suhteen.
+
+\chapter{Takaperäiset stokastiset differentiaaliyhtälöt (TSDY:t)}\label{tsdyluku}
+
+Tässä kappaleessa esittelemme yleisellä tasolla teorian \emph{takaperäisille stokastisille differentiaaliyhtälöille}\footnote{Lyhennämme termiä jatkossa TSDY:nä. Englanninkielisessä kirjallisuudessa, esimerkiksi lähteissä \cite{Pardoux} ja \cite{Touzi} käytetään termiä \emph{Backward stochastic differential equations, BSDE}.}.
+
+TSDY:t ilmestyivät ensimmäistä kertaa nykymuodossaan kirjallisuuteen Bismutin \cite{Bismut} aikaisen vaiheen artikkeleissa 70-luvun alussa, mutta systemaattisesti TSDY:itä tutkimaan alkoivat Pardoux ja Peng vuonna 1990 \cite{PardouxPeng}. Jos tutkisimme deterministisiä differentiaaliyhtälöitä, takaperäisten differentiaaliyhtälöiden ratkaisut olisivat triviaalisti olemassa yleisestä differentiaaliyhtälöiden teoriasta johtuen tarkastelemalla aikaa takaperin. Stokastisessa viitekehyksessä tämä on kuitenkin ongelma, sillä  käännetyn prosessin tulee olla adaptoitunut annettuun filtraatioon. Tämä ei ole tietenkään itsestäänselvä ominaisuus ja on samalla pääsyy siihen, että emme voi perustella TSDY:n ratkaisujen olemassaoloa kääntämällä prosessin aikakulkua yhtälössä \ref{sdy}. Joissain lähteissä tutkitaan yleisesti sellaista tilannetta, missä tarkastellaan TSDY:itä yhdessä etuperäisten stokastisten differentiaaliyhtälöiden kanssa. Tällöin tarkasteltavana on yhtälöpari
+\begin{equation}\label{fbsde}
+\begin{cases}X_t = X_0 + \int_0^t f_s ds + \int_0^t	\sigma_s dB_s \\ Y_t = X_T - \int_t^T h_s ds - \int_t^T \bar{\sigma}_s dB_s,\end{cases}
+\end{equation}
+minkä ympärille suuri osa esimerkiksi lähteestä \cite{Jinma} sijoittuu. Käsittelemme kuitenkin tässä tutkielmassa takaperäisiä stokastisia differentiaaliyhtälöitä ilman etuperäisten differentiaaliyhtälöiden taakkaa eli tarkastelumme pyörii yhtälön \ref{fbsde} termin $Y_t$ ympärillä.
+
+\section{Yhtälön määritelmä ja mielekkyys}
+
+Tarkastelemme seuraavaksi takaperäisten stokastisten differentiaaliyhtälöiden mielekkyyttä hyvin asetettuna ongelmana, erityisesti ratkaisun olemassaolon ja vertailukelpoisuuden saralla. Yleisimmin kirjallisuudessa ongelmien määrittelyn mielekkyyttä tarkastellaan \emph{huonosti määriteltyjen ongelmien}\footnote{Yleisesti kirjallisuudessa käytetään termiä \emph{ill-posed problem}.} käsitteen avulla, mitä esiintyy erityisesti niissä prosesseissa, joissa tarkastelemme aikaa takaperoisesti\footnote{TSDY:iden ulkopuolella hyvin määriteltyjen ongelmien käsite (engl. \emph{well-posed problem}) esiintyy erityisesti inversio-ongelmien yhteydessä. Tarkastelin lyhyesti inversio-ongelmien määritelmällistä mielekkyyttä kandidaatintutkielmassani osana Bayesiläisten inversio-ongelmien viitekehystä \cite{Tolonen}.} \cite{Kaipio}.
+
+Käytämme luvun \ref{itoluku} merkintöjä: olkoon $B_t$ $d$-ulotteinen $\mathcal{F}_t$-Brownin liike todennäköisyysavaruudessa $(\Omega, \mathcal{F},P,\{ \mathcal{F}\}_{t\geq 0})$.
+
+Olkoon $n,d\in \mathbb{N}$, ja edelleen oletamme kuvauksen
+\begin{equation}
+f:[0,T] \times \Omega \times \mathbb{R}^n \times \mathbb{R}^{n \times d} \mapsto \mathbb{R}.
+\end{equation}
+olevan $\mathcal{P} \otimes \mathcal{B}(\mathbb{R}^{n+nd})$-mitallinen, missä $\mathcal{P}$ on ennustettavien prosessien generoima $\sigma$-algebra.
+
+Tämän luvun viitekehyksessä tarkastelemme TSDY:tä
+\begin{equation}\label{tsdy-alkup}
+\begin{cases} dY_t = -f_t(Y_t,Z_t)dt + Z_tdB_t, \\
+Y_T = \xi
+\end{cases}
+\end{equation}
+$P$-melkein varmasti, missä $\xi$ on jokin $\mathcal{F}_T$-mitallinen $\mathbb{R}^n$-arvoinen satunnaismuuttuja. Viittaamme yhtälöön \ref{tsdy-alkup} lyhenteellä TSDY($f,\xi$), missä kuvausta $f$ kutsutaan \emph{generaattoriksi} ja arvoa $\xi$ \emph{terminaaliarvoksi} tai \emph{loppuarvoksi}. Kuten etuperäiset differentiaaliyhtälöt, myös TSDY($f,\xi$) voidaan kirjoittaa \emph{integraalimuodossa}
+\begin{equation}\label{tsdyintmuoto}
+Y_t = \xi + \int_t^T f_s(Y_s,Z_s)ds - \int_t^T Z_s dB_s
+\end{equation}
+$P$-m.v, missä $t\leq T$.
+
+Yhtälöstä \ref{tsdyintmuoto} on helppo päätellä, että TSDY:iden ominaisuuksista suuri osa riippuu generaattorista $f$. Tarkastelemme seuraavaksi TSDY:iden ominaisuuksia erilaisilla generaattoreilla.
+
+\section{Nollageneraattori ja lineaarinen generaattori}
+
+Jos $f=0$, niin kutsumme generaattoria $f$ \emph{nollageneraattoriksi}. Tällöin on helppo nähdä, että TSDY redusoituu martingaaliesityslauseeksi nykyhetken Brownin liikkeessä: jokaiselle $\xi \in L^2(\mathbb{R}^n,\mathcal{F}_T)$ on olemassa yksikäsitteinen prosessipari  $(Y,Z)\in H^2(\mathbb{R}^n \times \mathbb{R}^{n\times d}),$ joka toteuttaa yhtälön \ref{tsdy-alkup}:
+\begin{equation}
+Y_t := E(\xi | \mathcal{F}_t) = E(\xi) + \int_0^t Z_s dB_s = \xi - \int_t^T Z_s dB_s,
+\end{equation}
+missä $Y_t$ on $L^2$-martingaali ja prosessin $Z_t$ olemassaolo määräytyy Itôn esityslauseesta \ref{itoesitys}.
+
+Seuraavaksi tarkastelemme yksiulotteista TSDY:tä affiinilla generaattorilla
+\begin{equation}\label{yksiulgen}
+f_t(y,z) = a_t +b_ty + c_tz, 
+\end{equation}
+missä $a,b$ ja $c$ ovat $P$-progressiivisesti mitallisia prosesseja, $a$ ja $b$ saavat arvonsa joukossa $\mathbb{R}$ ja $c$ joukossa $\mathbb{R}^d$. Lisäksi $a$,$b$ ja $c$ ovat rajoitettuja ja integroituvia. Kutsumme tällaista stokastista differentiaaliyhtälöä \emph{lineaariseksi} generaattorin lineaarisuuden mukaan\footnote{Kirjallisuudessa, esimerkiksi lähteessä \cite{Jinma}, esiintyy termi Linear Backward Stochastic Differential Equation, LBSDE.} Tällaisen lineaarisen TSDY:n voi ongelman voi yksinkertaistaa vastaamaan tilannetta, jossa generaattorina on nollageneraattori, mutta erityisesti yhtälön \ref{yksiulgen} mukaiset generaattorit ovat tärkeitä rakennuspalikoita monimutkaisempien TSDY:iden tulkitsemisessa.
+
+Valitaan ekvivalentiksi todennäköisyysmitaksi todennäköisyysmitta $Q \sim P$ niin, että Radon-Nikodymin derivaatta määritellään tiheytenä
+\begin{equation}
+\frac{dQ_T}{dP_T} = e^{\int_0^T c_t dB_t - \frac{1}{2}\int_0^T |c_t|^2 dt}.
+\end{equation}
+Tällöin Girsanovin lauseen \ref{Girsanov} mukaan prosessi $W_t := B_t - \int_0^t c_s ds$ määrittelee Brownin liikkeen mitan $Q$ suhteen. Nyt tarkasteltava TSDY saadaan $Q$:n suhteen muotoon
+\begin{equation}\label{affgeneraattori_redusoity_stdy}
+dY_t = -(a_t + b_t Y_t)dt + Z_t dW_t.
+\end{equation}
+Huomioitavaa yhtälössä \ref{affgeneraattori_redusoity_stdy} on se, ettei sen generaattori riipu enää prosessista $z$. Kuten lähteen \cite{Touzi} esimerkin mukaan, pääsemme eroon lineaaritermistä $y$ esittelemällä apuyhtälön
+\begin{equation}\label{bary}
+\bar{Y}_t := Y_t e^{\int_0^t b_s ds},
+\end{equation}
+jolle Itôn kaavan avulla 
+\begin{equation}
+d \bar{Y}_t = e^{\int_0^t b_s ds}dY_t + b_t Y_te^{\int_0^t b_s ds} dt = -a_t e^{\int_0^t b_s ds}dt + Z_t e^{\int_0^t b_s ds}dW_t.
+\end{equation}
+Edelleen, määrittelemällä toisen apuyhtälön
+\begin{equation}
+\bar{\bar{Y}}_t := \bar{Y}_t + \int_0^t a_u e^{\int_0^u b_s du}du
+\end{equation}
+saamme lopulta yhtälön
+\begin{equation}\label{barbary}
+\eta := \bar{\bar{Y}}_T = Y_T e^{\int_0^T b_s ds} + \int_0^T a_u e^{\int_0^u b_s du}du,
+\end{equation}
+jolla on nollageneraattori $\bar{\bar{Y}}_t$:n suhteen eli millä voimme eliminoida jäljellä olevan termin $a_t$ generaattorista. Lisäksi yhtälölle \ref{barbary} pätee
+\begin{equation}
+d(\bar{\bar{Y}}_t) = Z_t e^{\int_0^t b_s ds} dW_t.
+\end{equation}
+
+Ratkaisemme nyt yhtälön \ref{barbary} Itôn esityslauseen avulla ekvivalentin todennäköisyysmitan $Q$ suhteen. Koska prosessi $Y_T = \xi$ on tuntematon terminaaliarvo ja siten satunnaismuuttuja mitan $Q$ suhteen, niin Esityslausetta \ref{itoesitys} käyttämällä on olemassa esitys
+\begin{align*}
+\eta & = E_Q(\eta|\mathcal{F}_t) + \int_t^T H_s dW_s \\
+& = E_Q\biggl(\xi e^{\int_0^T b_s ds} + \int_0^T a_u e^{\int_0^u b_s du}du\bigg\vert\mathcal{F}_t\biggr) + \int_t^T H_s dW_s
+\end{align*}
+jollekin ennustettavalle prosessille $H_s$. Tästä saamme edelleen prosessit 
+\begin{equation}\label{ybar_lineaarisissa}
+\bar{Y}_t = E_Q\biggl(\xi e^{\int_0^T b_s ds} + \int_t^T a_u e^{\int_0^u b_s du}du\bigg\vert\mathcal{F}_t\biggr)
+\end{equation}
+ja
+\begin{equation}
+Z_t = H_t \exp\biggl\lbrace -\int_0^t b_s ds \biggr\rbrace.
+\end{equation}
+Sijoittamalla yhtälön \ref{bary} yhtälöön \ref{ybar_lineaarisissa} saamme prosessin $Y_t $viimein muotoon 
+\begin{equation}\label{ratkaistu_lbsde}
+Y_t = E_Q\biggl(\xi e^{\int_t^T b_s ds} + \int_t^T a_u e^{\int_t^u b_s ds}du\bigg\vert\mathcal{F}_t\biggr).
+\end{equation}
+
+Esittelemme nyt lineaarisen generaattorin TSDY:lle selkeyttävän ominaisuuden:
+
+\begin{lem}\label{alkuarvopos_lemma}
+Olkoon prosessi $Y_t$ yhtälön \ref{tsdyintmuoto} ratkaisu ja edelleen $f_t(y,z)=a_t + b_ty + c_tz$ affiini generaattori. Tällöin jos termi $a_t$ ja terminaaliarvo $\xi$ ovat positiivisia, niin prosessi $Y_t$ on positiivinen.
+\begin{proof}
+Näemme yhtälöstä \ref{ratkaistu_lbsde}, että jos yhtälössä esiintyvät terminaaliarvo $\xi$ ja termi $a_u$ ovat positiivisia, niin prosessi $Y_t$ on positiivinen positiivisen satunnaismuuttujan ehdollisen odotusarvon ja positiivisen termin summana. 
+\end{proof}
+\end{lem}
+
+\section{Ratkaisun olemassaolo ja yksikäsitteisyys}
+
+Takaperäisten stokastisten differentiaaliyhtälöiden ratkaisun olemassaolo ja yksikäsitteisyys todistettiin alkuperäisesti herrojen Pardoux ja Peng toimesta kirjassa \cite{PardouxPeng}. Yksikäsitteisyys- ja olemassaololause on hyvin analoginen etuperäisten SDY:iden vastaavaan lauseeseen \ref{sdyolemasssaolo}, ja todistamme sen vastaavasti kutistusperiaatteella.
+
+\begin{lause}\label{tsdyolemassaolo}(Olemassaolo- ja yksikäsitteisyyslause TSDY:lle)
+Oletetaan $\{f_t(0,0), t\in[0,T]\}\in H^2$, $S^2$ joukko jatkuvia progressiivisesti mitallisia ja neliöintegroituvia prosesseja ja että jollekin $C>0$ pätee
+\begin{equation}\label{Lipschitz}
+|f_t(y,z)-f_t(y',z')| \leq C(|y-y'|+|z-z'|)
+\end{equation}
+$dt \otimes dP$-melkein varmasti kaikilla $t\in[0,T]$ ja $(y,z),(y',z')\in \mathbb{R}^n \times \mathbb{R}^{n \times d}$. Tällöin jokaista $\xi\in L^2$ kohti on olemassa yksikäsitteinen ratkaisu $(Y,Z)\in \mathcal{S}^2 \times H^2$ takaperäiselle stokastiselle differentiaaliyhtälölle $TSDY(f,\xi)$.
+
+\begin{proof}
+Seuraamme kirjan \cite{Touzi} todistusta. Merkitään $S = (Y,Z)$, ja määritämme ekvivalentin normin vastaavassa avaruudessa $H^2$:
+\begin{equation}
+||S||_\alpha := E\biggl( \int_0^T e^{\alpha t} (|Y_t|^2+|Z_t|^2)dt\biggr),
+\end{equation}
+missä $\alpha$ on myöhemmin kiinnitettävä vakio. Tarkastelemme alkuun yhtälön
+\begin{equation}
+Y_t^s = \xi + \int_t^T f_u(y_u, z_u)du - \int_t^T Z_u^s dB_u,
+\end{equation}
+$t\leq T$, määrittämää operaattoria 
+\begin{equation}
+\phi : s=(y,z) \in H^2 \mapsto S^s = (Y^s,Z^s).
+\end{equation}
+
+Ensiksi, epäyhtälöstä
+\begin{equation}
+|f_u(y_u,z_u)| \leq |f_u(0,0)|+ C(|y_u|+|z_u|)
+\end{equation}
+seuraa, että prosessi
+\begin{equation}
+\{f_u(y_u,z_u), u\leq T \} \in H^2.
+\end{equation}
+Nyt martingaaliesityslauseen \ref{martingaaliesitys} mukaisesti $S^s$ on hyvin määritelty, ja edelleen $S^s = \phi(s)\in H^2$ ja olkoon $S'=S^{s'}$.
+
+Toiseksi, jokaista $s,s'\in H^2$ kohti määrittelemme apuoperaattorit $\delta s := s-s'$, $\delta S := S-S'$ ja $\delta f := f_t(S^s) - f_t(S^{s'})$. Koska $\delta Y_T = 0$, suoraan Itôn kaavaa \ref{itokaava} soveltamalla saamme yhtälön
+\begin{equation}\label{ito_olemassaolo_todistuksessa}
+e^{\alpha t}|\delta Y_t|^2 + \int_t^T e^{\alpha u}|\delta Z_u|^2 du = \int_t^T e^{\alpha u} (2\delta Y_u \delta f_u - \alpha |\delta Y_u|^2)du - 2\int_t^T e^{\alpha u}(\delta Z_u)^\top \delta Y_u dB_u.
+\end{equation}
+Huomataan, että jos termi
+\begin{equation}\label{ito_olemassaolo_apu1}
+M_. := \int_0^. e^{\alpha u}(\delta Z_u)^\top \delta Y_u dB_u
+\end{equation}
+on tasaisesti integroituva martingaali, yhtälöstä \ref{ito_olemassaolo_todistuksessa} seuraa
+\begin{equation}\label{tsdy_olemassaolo_aputulos2}
+E\biggl( e^{\alpha t}|\delta Y_t|^2 + \int_t^T e^{\alpha u}|\delta Z_u|^2 du \bigg\vert \mathcal{F}_t \biggr) = E\biggl( \int_t^T e^{\alpha u} (2\delta Y_u \delta f_u - \alpha |\delta Y_u|^2)du \bigg\vert \mathcal{F}_t \biggr).
+\end{equation}
+
+Jotta yhtälö \ref{tsdy_olemassaolo_aputulos2} olisi voimassa, todistamme termin \ref{ito_olemassaolo_apu1} halutun martingaaliominaisuuden. Huomaamme, että $M_t$ on martingaali jos $\sup_{t\leq T} |M_t| \in L^1$. Nyt \emph{Burkholder-Davis-Gundy -epäyhtälön}\footnote{Muistutuksena lukijalle, että jos jokaista $1\leq p < \infty$ kohti on olemassa positiiviset vakiot $c_p$ ja $C_p$, niin jokaiselle paikalliselle martingaalille $X$, joille $X_0 = 0$, ja pysähdysajoille $\tau$, pätee $c_p E((X)_\tau^{p/2}) \leq E((X_\tau^*)^p) \leq C_pE((X)_\tau^{p/2})$, missä $X_\tau^* = \sup_{s\leq t} |X_s|$. Jatkuville martingaaleille epäyhtälö pätee kaikille $0<p<\infty$. Laajemmin aiheesta esimerkiksi kirjassa \cite{Friz}.} avulla 
+\begin{align*}
+E(\sup_{t\leq T}|M_t|) & \leq CE\big( (\int_0^T e^{2 \alpha u}|\delta Y_u|^2 |\delta Z_u|^2 du)^{\frac{1}{2}}\big) \\
+& \leq C'E\big( \sup_{u\leq T}|\delta Y_u| (\int_0^T  |\delta Z_u|^2 du )^{\frac{1}{2}}\big) \\
+& \leq \frac{C'}{2}\big( E\big( \sup_{u\leq T}|\delta Y_u|^2\big) + E\big( \int_0^T |\delta Z_u|^2 du \big) \big) < \infty,
+\end{align*}
+missä viimeinen arvio tulee yhteydestä $2|x,y|\leq ||x||^2+||y||^2$ joillakin prosesseilla $x,y$. Siis $\sup_{t\leq T} |M_t| \in L^1$, ja edelleen $M_t$ on martingaali. Nyt 
+\begin{align*}
+& E\big( e^{\alpha t}|\delta Y_t|^2 + \int_t^T e^{\alpha u}|\delta Z_u|^2 du \big) \\
+\leq & E\big( \int_t^T e^{\alpha u} (-\alpha |\delta Y_u|^2 + C2|\delta Y_u|(|\delta y_u|+|\delta z_u|)) du \big) \\
+\leq & E\big( \int_t^T e^{\alpha u} (-\alpha |\delta Y_u|^2 + C(\varepsilon^2|\delta Y_u|^2 + \varepsilon^{-2}(|\delta y_u|+|\delta z_u|)^2)) du \big)
+\end{align*}
+kaikille $\varepsilon > 0$. Tässä vaiheessa todistusta kiinnitämme vakion $\alpha$: ylläoleva epäyhtälö viittaa siihen, että turvallinen valinta vakiolle on $\alpha = C\varepsilon^2$. Nyt termin $\alpha$ myötä epäyhtälö redusoituu muotoon
+\begin{equation}
+E\biggl( e^{\alpha t}|\delta Y_t|^2 + \int_t^T e^{\alpha u}|\delta Z_u|^2 du \biggr) \leq E\biggl( \int_t^T e^{\alpha u}\frac{C}{\alpha}(|\delta y_u|+|\delta z_u|)^2 du \biggr) \leq 2\frac{C}{\alpha}||\delta s||^2_\alpha,
+\end{equation}
+ja tästä edelleen saamme arviot
+\begin{equation}
+||\delta Z||^2_\alpha \leq 2\frac{C}{\alpha}||\delta s||^2_\alpha
+\end{equation}
+ja 
+\begin{equation}
+||\delta Y||_\alpha^2 \leq 2\frac{T C}{\alpha}||\delta s||^2_\alpha.
+\end{equation}
+Huomion arvoista on, että väärinkäytimme yllä kirjan \cite{Touzi} tapaan notaatioita $||\delta Y||_\alpha^2$ ja $||\delta Z||_\alpha^2$, sillä näillä prosesseilla ei ole normin $||\cdot||_\alpha^2$ vaativaa dimensiota. Lopulta, näistä kahdesta estimaatista seuraa
+\begin{equation}
+||\delta S||_\alpha \leq \sqrt{\frac{2C}{\alpha}(1+T)}||\delta s||_\alpha.
+\end{equation}
+Nyt valitsemalla $\alpha > 2(1+T)C$ operaattori $\phi $ osoittautuu kutistukseksi avaruudessa $H^\alpha$, missä sillä on yksikäsitteinen kiintopiste $S=(Y,Z)$. 
+
+Enää on jäljellä osoittaa, että $Y\in \mathcal{S}^2$. Arvioimalla 
+\begin{equation}
+E\big( \sup_{t\leq T}|Y_t|^2\big) \leq C\biggl( |Y_0|^2 + E\biggl(\int_0^T |f_t(Y_t,Z_t)|^2 dt\biggr)+E\biggl(\sup_{t\leq T}\left|\int_0^t Z_s dB_s\right|^2\biggr)\biggr),  
+\end{equation}
+ja käyttämällä generaattorin $f$ \emph{Lipschitz-ominaisuutta}\footnote{Lukijalle muistutuksena, tarpeisiimme riittää Lipschitz-ominaisuus kuten lauseen oletuksissa on annettu yhtälössä \ref{Lipschitz}.} ja Burkholder-Davis-Gundy -epäyhtälöä käyttämällä saamme 
+\begin{align*}
+& C\biggl( |Y_0|^2 + E\biggl(\int_0^T |f_t(Y_t,Z_t)|^2 dt\biggr)+E\biggl(\sup_{t\leq T}\left|\int_0^t Z_s dB_s\right|^2\biggr)\biggr) \\
+\leq & C\biggl( |Y_0|^2 + E\biggl( \biggl(\int_0^T |f_t(Y_t,Z_t)| dt\biggr)^2 \biggr) + DE\biggl(\left|\int_0^t Z_s dB_s\right|\biggr)\biggr) \\
+\leq & C\biggl( |Y_0|^2 + E\biggl( \biggl(\int_0^T \tilde{D}(|Y_t|-|Z_t|+|a_t|) dt\biggr)^2 \biggr) + DE\biggl(\left|\int_0^t Z_s dB_s\right|\biggr)\biggr) <\infty,
+\end{align*}
+joillakin positiivisilla vakioilla $\tilde{D}$ ja $D$, jolloin $Y\in\mathcal{S}^2$ ja todistus on valmis.
+\end{proof}
+\end{lause}
+
+Nyt kun olemme todistaneet, että jokaisella muotoa \ref{tsdyintmuoto} olevalla yhtälöllä on yksikäsitteinen ratkaisu olemassa, niin siirrymme pohtimaan näiden ratkaisujen mielekkyyttä. Tarkastelemme asiaa niin sanotun \emph{vertailulauseen} näkökulmasta ja osoitamme, että ratkaisut ovat intuitiivisesti vertailukelpoisia, kun yhtälöiden generaattorit ja muut parametrit asetetaan suuruusjärjestykseen.
+
+\subsection{Ratkaisujen vertailu}
+
+Seuraava tulos kertoo TSDY:iden ratkaisujen ominaisuuksista ja vertailuista.
+
+\begin{lause}\label{vertailulause}(Vertailulause):
+Olkoon $n=1$, $i\in\{0,1\}$ ja pari $(Y^i,Z^i)$ sellainen stokastisen differetiaaliyhtälön TSDY$(f^i,\xi^i)$ ratkaisu jollekin parille $(\xi^i,f^i)$, mikä toteuttaa lauseen \ref{tsdyolemassaolo} oletukset. Lisäksi oletetaan, että generaattori $f(s,y,z)$ differentoituva parin $y,z$ suhteen, $\xi^0 \geq \xi^1$ ja $f_t^1(Y_t^0,Z_t^0) \geq f_t^0(Y_t^0,Z_t^0)$, $dt\otimes dP$-melkein varmasti. Tällöin
+\begin{equation}
+Y_t^1 \geq Y_t^0,
+\end{equation}
+missä $t\in[0,T]$, $P$-melkein varmasti.
+
+\begin{proof}
+Seuraamme kirjan \cite{Jinma} todistusta. Selkeyden vuoksi merkitsemme, että nyt
+\begin{equation}\label{vertailutod_yi}
+Y^i(t) = \xi^i + \int_t^T f^i(s,Y^i(s),Z^i(s))ds - \int_t^T  Z^i(s)dB_s,
+\end{equation}
+kun $i\in\{0,1\}$. Vastaavasti kuin lauseen \ref{tsdyolemassaolo} todistuksessa, merkitsemme kaikilla $0 \leq t\leq T$
+\begin{equation}
+\delta Y := Y^1 -Y^0, \delta Z := Z^1-Z^0, \delta_0 f(t) := f^0(t,Y^1,Z^1) - f^1(t,Y^1,Z^1), \delta \xi := \xi^0 - \xi^1.
+\end{equation}
+Selvästi prosessi $\delta_0 f$ on $\{\mathcal{F}_t\}_{t\geq 0}$-adaptoitunut ja positiivinen, ja nyt yhtälöstä \ref{vertailutod_yi} seuraa
+\begin{align}
+\delta Y = Y^1 - Y^0 & = \delta\xi+\int_0^T\big(f^1(s,Y_s^1,Z_s^1)-(f^1(s,Y_s^1,Z_s^1))\big)ds - \int_t^T \delta Z(s)dB_s \nonumber \\
+& =\delta\xi+\int_0^T\big(\alpha(s)\delta Y(s) + \beta(s) \delta Z(s) + \delta f(s)\big)ds - \int_t^T \delta Z(s)dB_s,
+\end{align}
+missä
+\begin{equation}
+\alpha(s) = \int_0^1 \partial_y f^1(s,Y^1(s)+\lambda \delta Y(s),Z^1(s)+ \lambda \delta Z(s))d\lambda
+\end{equation}
+ja 
+\begin{equation}
+\beta(s) = \int_0^1 \partial_z f^1(s,Y^1(s)+\lambda \delta Y(s),Z^1(s)+ \lambda \delta Z(s))d\lambda.
+\end{equation}
+Selvästi prosessit $\alpha$ ja $\beta$ ovat $\{\mathcal{F}_t\}_{t\leq T}$-adaptoituneita prosesseja ja lauseesta \ref{tsdyolemassaolo} perittyjen oletusten nojalla myös tasaisesti rajoitettuja. Erityisesti prosessille $\beta$ pätee niin kutsuttu \emph{Novikovin ehto}\footnote{Ehdon todisti alkuperäisesti venäläinen matemaatikko Alexander Novikov. Tulos antaa löyhästi kuvailtuna riittävän ehdon sellaiselle stokastiselle prosessille, joka tekee Radon-Nikodymin derivaatasta martingaalin. Jos $X$ on tarkasteltava stokastinen prosessi, niin ehto on $E\biggl(e^{{\frac {1}{2}}\int _{0}^{T}|X|_{t}^{2}\,dt}\biggr)<\infty$.}, ja siten prosessi 
+\begin{equation}
+M(t)= \exp\biggl\lbrace\int_0^t \beta(s) dB_s - \frac{1}{2}\int_0^t|\beta|^2 ds\biggr\rbrace,
+\end{equation}
+$t\leq T$, on P-martingaali. Muutamme nyt tarkasteltavaa todennäköisyysmittaa, ja määritämme uuden mitan $\tilde{P}$  $\sigma$-algebrassa $\mathcal{F}_T$ siten, että
+\begin{equation}
+\frac{d\tilde{P}}{dP} = M(T).
+\end{equation}
+Nyt Girsanovin lauseen mukaan $\tilde{B}_t = B_t - \int_0^t\beta(s) ds$ on Brownin liike mitan $\tilde{P}$ suhteen. Lisäksi mitan $\tilde{P}$ suhteen
+\begin{equation}
+\delta Y(t) = \delta \xi + \int_t^T \big( \alpha(s)\delta Y(s) + \delta f(s) \big)ds - \int_t^T \delta Z(s) d\tilde{B}_s.
+\end{equation}
+Määrittelemme nyt \emph{tiheysprosessin}\footnote{Tämä prosessi osoittautuu tärkeäksi työkaluksi TSDY:iden maailmassa. Esimerkiksi lähteissä \cite{Touzi} ja \cite{Princeton} moni TSDY:iden ydinteorian lause perustellaan näiden prosessien avulla. Käytämme myös prosessia $\Gamma$ rahoitusteoreettisessa sovelluksessa kirjan \cite{Princeton} opastuksesta. Tällöin tiheysprosessia kutsutaan \emph{hintatiheysprosessiksi}.} $\Gamma_\alpha(t)=\Gamma(t)=\exp\{\int_0^t \alpha(s) ds\}$, ja nyt Itôn kaavasta seuraa
+\begin{equation}
+\Gamma(T)\delta \xi - \Gamma(t)\delta Y(t) = -\int_t^T \Gamma(s) \delta f(s) ds + \int_t^T \delta Z(s) d\tilde{B}_s.
+\end{equation}
+Ottamalla ylläolevasta yhtälöstä ehdolliset odotusarvot saamme 
+\begin{equation}
+E_{\tilde{P}}\biggl( \Gamma(T)\delta \xi - \Gamma(t)\delta Y(t)\bigg\vert\mathcal{F}_t\biggr)=E_{\tilde{P}}\biggl( -\int_t^T \Gamma(s) \delta f(s) ds + \int_t^T \delta Z(s) d\tilde{B}_s \bigg\vert \mathcal{F}_t\biggr),
+\end{equation}
+ja edelleen prosessin $\Gamma(.)\delta Y(.)$ adaptoituvuudesta seuraa yhteys
+\begin{equation}
+\Gamma(t)\delta Y(t) = E_{\tilde{P}}\biggl(	\Gamma(T)\delta\xi + \int_t^T \Gamma(s)\delta f(s) ds | \mathcal{F}_t \biggr) \geq 0
+\end{equation}
+kaikilla $t\in[0,T]$ $\tilde{P}$-melkein varmasti, mistä seuraa $P$-melkein varmuus ja siten tulos on todistettu.
+\end{proof}
+\end{lause}
+
+Nyt kun esittelimme lauseen \ref{vertailulause} yhteydessä tiheysprosessin $Gamma(t)$, tarkastelemme tätä prosessia hieman. Prosessi esiintyy useissa TSDY:iden sovelluskohteissa ja käy ilmi \cite{Touzi}, että prosessi $\Gamma$ voidaan johtaa myös lineaarisen stokastisen differentiaaliyhtälön
+\begin{equation}\label{prosessidy}
+\begin{cases}
+d\Gamma_t = \Gamma_t (a_tdt + b_t dB_t) \\ \Gamma_0 = 1\end{cases}
+\end{equation}
+ratkaisuna. Vielä tarkemmin käy ilmi, että affiinilla generaattorilla \ref{yksiulgen} varustetun yhtälön TSDY$(f,\xi)$ voidaan esittää ja johtaa prosessin $\Gamma$ avulla:
+
+\begin{lem}\label{lbsde_tiheysprosessilla}
+Tarkastellaan yhtälöä TSDY$(f,\xi)$ lineaarisella generaattorilla \ref{yksiulgen} luvulle ominaisten oletuksien pätiessä. Nyt yksikäsitteinen ratkaisu $(Y,Z)$ saadaan yhtälöstä 
+\begin{equation}
+\Gamma_t Y_t = E\biggl( \Gamma_T \xi + \int_t^T \Gamma_s c_s ds \bigg\vert \mathcal{F}_t \biggr),
+\end{equation}
+missä $d\Gamma_t = \Gamma_t (a_tdt + b_t dB_t)$ ja $\Gamma	_0 = 1$. Edelleen, saamme prosessin $Z_t$ Itôn esityslauseesta \ref{itoesitys} muodossa
+\begin{equation}
+M_t := E\biggl( \Gamma_T \xi + \int_0^T \Gamma_s c_s ds \bigg\vert \mathcal{F}_t \biggr).
+\end{equation}
+
+Lisäksi voimme kirjoittaa yhtälön \ref{prosessidy} ratkaisun $\Gamma$ stokastisen eksponentin avulla seuraavasti jatkuvana semimartingaalina:
+\begin{equation}
+\Gamma_t = \mathcal{E}(\int_0^\cdot a_s ds + \int_0^\cdot b_s dB_s) = \exp\biggl\lbrace \biggl(\int_0^t a_s - \frac{1}{2}b^2_s\biggr) ds + \int_0^t b_sdB_s \biggr\rbrace.
+\end{equation}
+\begin{proof}
+Viittaamme lähteiden \cite{Touzi} ja \cite{Pham} todistuksiin.
+\end{proof}
+\end{lem}
+
+Annamme muutaman huomion merkinnöistä:
+
+\begin{huom}
+Joskus kirjallisuudessa, esimerkiksi lähteissä \cite{Princeton} ja \cite{Elkaroui}, sisällytetään prosessin $\Gamma$ sisältävät integrointirajat alaindeksiin. Lisäksi, joskus prosessin differentiaaliyhtälön \ref{prosessidy} drift ja hajonta sisällytetään yläindeksiin, jos haluamme tarkentaa prosessin ominaisuuksia. Tällöin yhtälön \ref{prosessidy} toteuttavaa prosessia voidaan merkitä muodossa
+\begin{equation}
+\Gamma_{t,T}^{a,b}.
+\end{equation}
+Tätä merkintää tullaan käyttämään myöhemmin rahoitusteoreettisten sovelluksien yhteydessä.
+\end{huom}
+
+Seuraava tulos kertoo kahden TSDY:n ratkaisujen itseisarvoisesta erosta ja samalla antaa ylärajan, joka riippuu sekä generaattorejen ja loppuarvojen välisistä eroista. 
+
+\begin{lause}
+Olkoon $i\in\{0,1\}$ ja $(Y^i,Z^i)$ yhtälön TSDY$(f^i, \xi^i)$ ratkaisu, joka täyttää olemassaolo- ja yksikäsitteisyyslauseen \ref{tsdyolemassaolo} ehdot. Tällöin
+\begin{equation}
+||Y^1-Y^0||^2_{\mathcal{S}^2} +  ||Z^1-Z^0||^2_{H^2} \leq C\big( ||\xi^1-\xi^0||^2_{L^2} + ||(f^1-f^0)(Y^0,Z^0)||^2_{H^2}\big),
+\end{equation}
+missä vakio $C$ riippuu vain ja ainoastaan terminaaliajasta $T$ sekä generaattorin $f^1$ Lipschitz-ehdon vakioista. 
+\begin{proof}
+Vastaavasti kuten aikaisemmissa luvun todistuksissa, merkitään $\delta\xi := \xi^1 - \xi^0$, $\delta Y := Y^1 - Y^0$, $\delta f := f^1(Y^1,Z^1) - f^0(Y^0,Z^0)$ ja $\Delta f := f^1-f^0$. Nyt Itôn kaavan mukaan jollekin vakiolle $\beta$ pätee
+\begin{align*}
+e^{\beta t}|\delta Y_t|^2 = & e^{\beta T}|\delta \xi|^2 + \int_t^T e^{\beta u}\big( 2\delta Y_u \cdot \delta f_u - |\delta Z_u|^2 - \beta |\delta Y_u|^2 \big) du \\ & + 2 \int_t^T e^{\beta u} \delta Z_u^{\top} \delta Y_u dB_u.
+\end{align*}
+Vastaavasti kun olemassaolo- ja yksikäsitteisyyslauseen \ref{tsdyolemassaolo} todistuksessa, ylläolevan yhtälön stokastisen integraalin sisältävälle termille pätee
+\begin{equation}
+E\biggl( 2 \int_t^T e^{\beta u} \delta Z_u^{\top} \delta Y_u dB_u \biggr) = 0,
+\end{equation}
+ja nyt 
+\begin{equation}
+e^{\beta t}|\delta Y_t|^2 = E\biggl( e^{\beta T}|\delta \xi|^2 + \int_t^T e^{\beta u}\big( 2\delta Y_u \cdot \delta f_u - |\delta Z_u|^2 - \beta |\delta Y_u|^2 \big) du \bigg\vert \mathcal{F}_t \biggr).
+\end{equation}
+Arvioimme edelleen, että jokaiselle $\varepsilon > 0$ pätee
+\begin{align*}
+2\delta Y_u \cdot \delta f_u & \leq \varepsilon^{-1}|\delta  Y_u|^2 + \varepsilon|\delta f_u|^2 \\
+& \leq \varepsilon^{-1} |\delta Y_u|^2 + \varepsilon\big( C(|\delta Y_u| + |\delta Z_u|) + |\Delta f_u(Y^0_u,Z^0_u)|) \big)^2 \\
+& \leq \varepsilon^{-1} |\delta Y_u|^2 + 3\varepsilon\big( C^2(|\delta Y_u|^2 + |\delta Z_u|^2) + |\Delta f_u(Y^0_u,Z^0_u)|) \big)^2.
+\end{align*}
+Jos kiinnitämme mielivaltaiset vakiomme siten, että $\varepsilon := 1/(6C^2)$ ja $\beta := 3\varepsilon C^2 + \varepsilon^{-1}$ niin saamme arvion
+\begin{equation}\label{vertailulause_epäyhtälö_ennensup}
+e^{\beta t}|\delta Y_t|^2+\frac{1}{2}E\biggl( \int_t^T |\delta Z_u|^2 du \bigg\vert\mathcal{F}_t \biggr) \leq E\biggl( e^{\beta T}|\delta \xi|^2 + \frac{1}{2C^2}\int_0^T e^{\beta u}|\Delta f_u(Y_u^0,Z_u^0)|^2 du \bigg\vert\mathcal{F}_t \biggr).
+\end{equation}
+Huomaamme, että prosessi $E(e^{\beta T} |\delta \xi|^2 | \mathcal{F}_t)$ on martingaali. Nyt viimein Doobin martingaaliepäyhtälöstä seuraa yhdessä aikaisempien osien kanssa päättelyketju
+\begin{align*}
+& ||Y^1-Y^0||^2_{\mathcal{S}^2} +  ||Z^1-Z^0||^2_{H^2}  \\
+\leq & \sup \left\lbrace e^{\beta t}|\delta Y_t|^2+\frac{1}{2}E\biggl( \int_t^T |\delta Z_u|^2 du \bigg\vert\mathcal{F}_t \biggr) \right\rbrace \\
+\leq & \sup \left\lbrace E\biggl( e^{\beta T}|\delta \xi|^2 + \frac{1}{2C^2}\int_0^T e^{\beta u}|\Delta f_u(Y_u^0,Z_u^0)|^2 du \bigg\vert\mathcal{F}_t \biggr) \right\rbrace \\
+\leq & C\big( ||\xi^1-\xi^0||^2_{L^2} + ||(f^1-f^0)(Y^0,Z^0)||^2_{H^2}\big),
+\end{align*}
+joten väite on todistettu.
+\end{proof}
+\end{lause}
+
+\section{Generaattorit ilman Lipschitz-ominaisuutta}
+
+Viimeisenä teoriaosuutena ennen siirtymistä  sovelluskohteisiin esittelemme hieman sellaisten yksiulotteisten TSDY:iden teoriaa, joiden generaattorit $f$ eivät täytä Lipschitz-ominaisuutta kuten edellisen kappaleen lauseissa. Seuraamme artikkelin \cite{Princeton} otetta, joksikin käsittelemämme tulokset tulivat ensi kerran esille artikkelissa \cite{Lepertier}. Tarvitsemme kuitenkin muutaman oletuksen rajaamaan yleistystä, ja käsittelemme seuraavaksi sellaisia generaattoreita täyttävät seuraavat ehdot:
+\begin{enumerate}[(a)]
+\item generaattori $f$ kasvaa lineaarisesti\footnote{Sanomme, että funktio $f$ kasvaa lineaarisesti, jos on olemassa funktio $b_k(y,z):=k(|y|+|z|)$ jolle kaikilla pareilla $y,z$ pätee $|f_t(\omega, y, z)|\leq |f_t(\omega,0,0)| + k(|y|+|z|)$ $dt\otimes dP$-melkein varmasti.},
+\item prosessi $\{f(t,0,0)\}_{t\leq T} \in H^2$ ja
+\item polkufunktio $(y,z) \mapsto f_t(\omega,y,z)$ on jatkuva $dt\otimes dP$-melkein kaikkialla. 
+\end{enumerate}
+
+Esittelemme nyt lähteen \cite{Lepertier} mukaisesti \emph{inf-konvoluution} käsitteen lemmana, mitä käytämme aputuloksena seuraavan tuloksen todistamisessa.
+
+\begin{lem}\label{lepertier-sanmartin}(Lepertier -- San Martin):
+Olkoon $f:\mathbb{R}^d \mapsto \mathbb{R}$ jatkuva funktio lineaarisella kasvulla $|f(x)|\leq k(1+|x|)=b_k(x)$. Määrittelemme jonon
+\begin{equation}
+f_n(x)=\inf_{y\in\mathbb{Q}^d}(f(y)+n|x-y|) = f \Box b_n^0(x) 
+\end{equation}
+olevan funktion $f$ inf-konvoluutio funktiolla $b^0_n(x)=n|x|$. Lisäksi jono $f_n$ on äärellinen kaikilla $n\geq k$, ja se on varustettu seuraavilla ominaisuuksilla:
+\begin{enumerate}[(i)]
+\item $|f_n(x)|\leq k(1+|x|)=b_k(x)$,
+\item jono $f_n$ on nouseva,
+\item jono $f_n$ on Lipschitz-jatkuva ja $|f_n(x)-f_n(y)|\leq n|x-y|$, ja viimeiseiksi
+\item jos $x_n \rightarrow x$, niin $g_n(x_n)\rightarrow g(x).$
+\end{enumerate}
+\begin{proof}
+Sivuutetaan.
+\end{proof}
+\end{lem}
+
+Nyt ehdoista $(a)-(c)$ seuraa seuraava tulos:
+
+\begin{lause}\label{ei-lip-min}
+Jos kappaleen ehdot $(a)-(c)$ pätevät, niin yhtälöllä TSDY$(f,\xi_T)$ on minimaalinen ratkaisu $(Y,Z)$. Toisin sanoen, jos pari $(Y',Z')$ on yhtälön \ref{tsdyintmuoto} toinen ratkaisu, niin tällöin $Y\leq Y'$ P-melkein varmasti.
+\begin{proof}
+Käyttämällä lemmaa \ref{lepertier-sanmartin} huomaamme, että funktiot $f_n$, $b_k$ ja $-b_k$ ovat avaruuden $H^2$ alkioita ja Lipschitz-jatkuvia. Nyt jollekin $n\leq k$, olkoon pari $(Y^n,Z^n)$ yhtälön TSDY$(f_n,\xi_T)$ ratkaisu, pari $(U^0,V^0)$ yhtälön TSDY$(-b_k,\xi_T)$ ja pari $(U^1,V^1)$ yhtälön TSDY$(b_k,\xi_T)$ ratkaisu. Nyt takaperäisten stokastisten differentiaaliyhtälöiden vertailulauseen \ref{vertailulause} mukaan kaikille $n\geq k$ pätee
+\begin{equation}
+U^1 \geq Y^{n+1} \geq Y^n \geq U^0,
+\end{equation}
+ja tällöin jono $\{Y^n\}_{n\leq 0}$ suppenee avaruudessa $H^2$ kohti prosessia $Y$.
+
+Huomaamme, että kun $n\leq k$, niin arvio
+\begin{equation}
+E(\sup_{0\leq s\leq T}|Y_s^n|^2) \leq E(\sup_{0\leq s \leq T}(|U^0_s|+|U^1_s|)^2) < \infty
+\end{equation}
+pätee. Soveltamalla Itôn kaavaa prosessiin $(Y_t^n)^2$, käyttämällä epäyhtälöä $2k|ab| \leq 2k^2|a|^2 + (1/2)|b|^2 $ ja generaattorin $f$ lineaarisen kasvun ominaisuutta saamme arvion
+\begin{align}\label{arvio_eiliptod}
+E\biggl( (Y_0^n)^2 + \int_0^T |Z_s^n|^2 ds\biggr) & \leq E(\xi_T^2) + 2E\biggl( \int_0^T |Y_s^n| (|g(s,0,0)|+k(|Y_s^n|+|Z_s^n|)) ds\biggr) \nonumber \\
+& \leq c + \frac{1}{2}E\biggl( \int_0^T |Y_s^n|^2 ds\biggr) + 2kE\biggl( \int_0^T|Y_s^n||Z_s^n|ds \biggr) \nonumber \\
+& \leq c + CE\biggl( \int_0^T |U_s^0+U_s^1|^2 ds \biggr) + \frac{1}{2}E\biggl( \int_0^T |Z_s^n|^2 ds \biggr),
+\end{align}
+missä $c$ ja $C$ ovat positiivisia vakioita. Arviosta \ref{arvio_eiliptod} seuraa, että jonot $\{\sup_{0\leq s \leq t}|Y_s^n|^2\}_{n\geq k}$ ja $\{\int_0^T |Z_s^n|ds\}_{n\geq k}$ rajoitettuja avaruudessa $L^1$. Edelleen generaattorin $f_n$ lineaarisesta kasvusta ja ominaisuudesta $f_t(0,0)\in H^2$ seuraa, että jono
+\begin{equation}
+\biggl\lbrace \int_0^T f_n(Y_s^n,Z_s^n)^2 ds \biggr\rbrace_{n\geq k}
+\end{equation}
+on myös vakiolla $k_f$ rajoitettu avaruudessa $L^1$. Edellä olevista arvioista seuraa, että jono $\{Z^n\}_{n\geq k}$ on Cauchy avaruudessa $H^2$. Nyt edelleen Itôn kaavasta, kun $n,m \geq k$, seuraa arvio
+\begin{align}
+& E\biggl(\int_0^T |Z_s^n - Z_s|^2ds\biggr) \leq |Y_0^n -Y_0^m|^2 + 2E\biggl( \int_0^T (Y_s^n - Y_s^m)(f(s,Y_s^n,Z_s^n)-f(s,Y_s^m,Z_s^m)) ds \biggr) \\
+\leq & |Y_0^n -Y_0^m|^2 + 2\biggl( E\biggl( \int_0^T |Y_s^n - Y_s^m|^2 ds \biggr)\biggr)^\frac{1}{2} \biggr( E\biggr( \int_0^T |f_n(s,Y_s^n,Z_s^n)-f_n(s,Y_s^m,Z_s^m)|^2 ds \biggl) \biggl)^\frac{1}{2} \nonumber \\
+\leq & |Y_0^n -Y_0^m|^2 + 2(k_f)^\frac{1}{2}\biggl( E\biggl( \int_0^T |Y_s^n-Y_s^m|^2 ds \biggr) \biggr)^\frac{1}{2}. \nonumber
+\end{align}
+Arviosta ja martingaalien suppenemisteoriasta\footnote{Kyseinen suppenemislause ja sen yhteys pysäytysaikoihin ja raja-arvoihin perusteltu lähteessä \cite{Princeton}.} seuraa, että jokaiselle pysäytysajalle $v \leq T$ pätee
+\begin{equation}
+\lim_{n\rightarrow\infty} E\biggl(\left|\int_0^v (Z_s^n - Z_s) dB_s \right|^2 \biggr) = 0.
+\end{equation}
+Tiedämme myös, että pysäytysajalle $v$ pätee $\lim_{n\rightarrow\infty}E(|Y_v^n-Y_v|^2) = 0$, jolloin väite on todistettu, jos ja vain jos $\lim_{n\rightarrow\infty}\{\int_0^v f_n(s,Y_s^n,Z_s^n)-f(s,Y_s,Z_s)ds\}_{n\geq k} = 0$ avaruudessa $L^1$. Tosiaan, 
+\begin{align}\label{ei_lip_arvio3}
+E\biggl( \left|\int_0^v f_n(s,Y_s^n,Z_s^n)-f(s,Y_s,Z_s)ds\right|\biggr) & \leq E\biggl( \int_0^T |f_n(s,Y_s^n,Z_s^n)-f(s,Y_s,Z_s)|\mathbf{1}_{\{|Y^n_s|+|Z^n_s|\leq k\}}ds\biggr) \nonumber \\
+& + E\biggl( \int_0^T |f_n(s,Y_s^n,Z_s^n)-f(s,Y_s,Z_s)|\mathbf{1}_{\{|Y^n_s|+|Z^n_s| > k\}}ds\biggr).
+\end{align}
+Kuten lähteessä \cite{Princeton} mainitaan ja merkitään, on olemassa sellainen osajono $n$, jolla arvion \ref{ei_lip_arvio3} oikean puolen ensimmäinen termi suppenee nollaan, kun $n\rightarrow\infty$ $P$-melkein varmasti, sillä jokaisella $t\leq T$ termi $\{f^n_t(\omega, y,z)\}_{n \leq k}$ suppenee kohti termiä $f_t(\omega, y,z)$ avaruuden $\mathbb{R}^{1+d}$ kompakteilla osajoukoilla. Arvion \ref{ei_lip_arvio3} oikean puolen toista termiä arvioidessa huomaamme, että generaattorin $f_n$ lineaarisen kasvun ominaisuudesta seuraa $|f_n(s,Y_s^n,Z_s^n)-f(s,Y_s,Z_s)| \leq k(|Y_s^n|+|Z_s^n|+ |\psi_s|)$ jollakin $\psi\in H^2$. Koska jono $\{|Y_s^n|+|Z_s^n|\}$ on rajoitettu avaruudessa $H^2$ ja $\mathbf{1}_{\{|Y_s^n|+|Z_s^n| > k\}}$, niin tarkasteltava toinen termi on rajoitettu jollain vakiolla $\delta/k$, mikä suppenee nollaan kun $k\rightarrow\infty$. Edelleen, jokaiselle pysähdysajalle $v$ pätee
+\begin{equation}\label{ei_lip_tod_pysyht}
+Y_v = Y_0 - \int^v_0 g(s,Y_s,Z_s)ds + \int_0^v Z_s dB_s.
+\end{equation}
+Lopuksi viittaamme kirjan \cite{Dellacherie} teoriaan, jonka mukaan prosessit $X$ ja $X'$ ovat \emph{erottamattomia}\footnote{Sanomme, että stokastiset prosessit $X$ ja $Y$ ovat erottamattomat, mikäli on olemassa joukko $A\in\Omega$, jolle $X_t(\omega) = Y_t(\omega)$ kaikilla $\omega\in A$ ja $t\geq 0$.}, mikäli jollakin pysähdysajalla $v$ pätee $X_v=X'_v$. Tällöin yhtälöstä \ref{ei_lip_tod_pysyht} seuraa, että prosessit $Y$ ja $\{Y_0 - \int^t_0 g(s,Y_s,Z_s)ds + \int_0^t Z_s dB_s\}_{t\leq T}$ ovat erottamattomia ja täten pari $(Y,Z)$ on yhtälön TSDY$(f,\xi_T)$ ratkaisu. 
+
+Katsomme vielä, että pari $(Y,Z)$ on minimaalinen ratkaisu.  Jos pari $(Y',Z')$ on yhtälön toinen ratkaisu, niin näemme helposti, että vertailulauseen \ref{vertailulause} mukaan $Y^n \leq Y'$, sillä $g_n \leq g$ ja edelleen jonon $\{Y_n\}$ raja-arvon tarkastelusta seuraa, että $Y\leq Y'$ ja siten pari $(Y,Z)$ on yhtälön minimaalinen ratkaisu.
+\end{proof}
+\end{lause}
+
+Huomiona lukijalle, että olisimme löytäneet yhtälölle TSDY$(f,\xi)$ maksimaalisen ratkaisun minimaalisen sijasta, mikäli jono $f_n$ olisi ollut laskeva lemmassa \ref{lepertier-sanmartin}. Nyt voimme päätellä lauseesta \ref{ei-lip-min} vertailutuloksen\footnote{Vertaa lineaaristen TSDY:iden vertailulauseeseen \ref{vertailulause}.}
+
+\begin{prop} Olkoon pari $(Y,Z)$ minimaalinen ratkaisu yhtälölle TSDY$(f,\xi_T)$, missä pari $(f,\xi_T)$ täyttää kappaleen ehdot $(a)-(c)$. Tarkastellaan toisen yhtälön TSDY$(\bar{f},\bar{\xi}_T)$ ratkaisua $(\bar{Y},\bar{Z})$. Oletetaan, että $\xi_T \leq \bar{\xi}_T$ $P$-melkein varmasti ja että $f_t(\bar{Y}_t,\bar{Z}_t) \leq \bar{f}_t(\bar{Y}_t,\bar{Z}_t)$ $dP \otimes dt$-melkein kaikkialla. Tällöin
+\begin{equation}
+Y\leq \bar{Y}
+\end{equation}
+$P$-melkein varmasti.
+\begin{proof}
+Huomaamme, että proposition oletuksista seuraa, että kaikille kasvaville generaattorin $f$ approksimaatioille $f_n$ pätee $f_n(t,\bar{Y}_t,\bar{Z}_t) \leq \bar{f}(t,\bar{Y}_t,\bar{Z}_t)$. Nyt lemmassa \ref{lepertier-sanmartin} määritellyille Lipschitz-jatkuville $g_n$ ja niiden ratkaisuille $(Y^n,Z^n)$ on voimassa vertailulauseen \ref{vertailulause} ehdot, ja täten $Y^n \leq \bar{Y}$ $P$-melkein varmasti. Epäyhtälö seuraa raja-arvolle, jolloin $Y \leq \bar{Y}$.
+\end{proof}
+\end{prop}
+
+Nyt olemme käsitelleet takaperäisten stokastisten differentiaaliyhtälöiden ydinteoriaa. Olemme todistaneet, että yhtälöillä on yksikäsitteiset ratkaisut, niiden vertailu on mielekästä ja ne voidaan ratkaista usealla eri generaattorivalinnalla. Kuten huomasimme, yleiset generaattorivalinnat pyritään redusoimaan lineaarisen generaattorin tapaukseen ja edelleen nollageneraattorin kaltaiseksi. Viimeiseksi käsittelemme lyhyesti takaperäisten stokastisten differentiaaliyhtälöiden sovelluskohteita rahoitusteorian piirissä.
+
+
+\chapter{Takaperäiset stokastiset differentiaaliyhtälöt rahoitusteoriassa}
+
+Tässä luvussa esittelemme ensiksi lyhyesti klassikkoartikkelin Black-Scholes 1973 \cite{BlackScholes} kuvaaman johdannaismarkkinan oletuksineen, esittelemme optimaalisen portfolion teoriaa eurooppalaisille optioille ja kertaamme matemaattisen rahoitusteorian perusoletukset. Luku pohjautuu Nicole El Karouin et al. artikkeleihin \cite{Elkaroui} ja \cite{Princeton}.
+
+\section{Rahoitusteorian peruskäsitteitä ja eurooppalaisten optioiden hinnottelu TSDY:n viitekehyksessä}
+
+Aloitamme kuvaamalla markkinamallia ja kertaamalla muutaman rahoitusteoreettisen oletuksen. Tarkastelemme tyypillistä mallia jatkuva-aikaisen rahoitusinstrumenttien hinnottelussa: olkoon rahoitusinstrumenttien määrä $n+1$ kappaletta, joista yksi on lokaalisti riskitön instrumentti\footnote{Lokaalisti riskittömällä instrumentilla tarkoitamme, että instrumentin riskittömyys ei ota huomioon markkinoiden epäonnistumista vastapuolten konkurssissa.}. Tämän riskittömän instrumentin yksikköhinta $P^0$ määräytyy kaavasta
+\begin{equation}
+dP^0_t = P^0_t r_t dt, 
+\end{equation}
+missä $r_t$ on lyhyt korko ajan $t$ suhteen. Tämän riskittömän instrumentin (joukkovelkakirja) lisäksi meillä on $n$ kappaletta riskillisiä sijoituskohteita (osakkeita), joita ostetaan ja myydään jatkuva-aikaisesti. $i$:nnen osakkeen hintaprosessa $P^i$ mallinnetaan stokastisella differentiaaliyhtälöllä
+\begin{equation}
+dP^i_t = P^i_t\biggl( b_t^i dt + \sum_{j=1}^n \sigma_t^{i,j} dB_t^j \biggr),
+\end{equation}
+missä $B_t$ on $n$-ulotteinen Brownin liike avaruudessa $(\Omega, \mathcal{F}, P, \mathcal{F}_t)$ ja  $b_t$ on $\mathcal{F}_t$-mitallinen ja rajoitettu prosessi. Määrittelemme \emph{volatiliteettimatriisin} $\sigma$ tarkat ominaisuudet myöhemmin. 
+
+Teemme nyt muutaman oletuksen markkinamalliimme mallintamisen helpottamiseksi\footnote{Markkinoita, jotka täyttävät nämä ominaisuudet, kutsutaan \emph{täydellisiksi}. Osa oletuksista eivät ilmiselvästi päde ns. reaalimaailmasa, esimerkiksi negatiiviset reaalikorot rikkovat usean rahoitusteoreettisen mallin oletukset \cite{negrates}. Täydellisten markkinoiden käsitteestä lisää lähteissä \cite{Follmer} ja \cite{Sottinenrahis}.}:
+
+\begin{enumerate}[(1)]
+\item Lyhyt korko $r_t$ on epänegatiivinen, $\mathcal{P}$-ennustettava ja rajoitettu prosessi.
+\item Sarakevektori $b = (b^1,\dots,b^n)^\top$ on $\mathcal{P}$-ennustettava ja rajoitettu prosessi.
+\item Volatiliteettimatriisi  $\sigma = (\sigma^{i,j})$ on ennustettava ja rajoitettu prosessi. Matriisilla on $P$-melkein varmasti täysi aste\footnote{Matriisin aste kertoo matriisin lineaarisesti riippumattomien sarakkeiden määrän. Jos matriisin kaikki sarakkeet ovat riippumattomia, sanomme että matriisilla on \emph{täysi aste}.} kaikilla $t\in[0,T]$. Lisäksi matriisi $\sigma$ on kääntyvä, ja sen käänteismatriisi $\sigma^{-1}$ on myös rajoitettu prosessi.
+\item Markkinoilla on olemassa sellainen ennustettava ja rajoitettu prosessivektori $\theta$, jolle $b_t - r_t \mathbf{1} = \sigma_t \theta_t$, missä $\mathbf{1}$ on ns. yksikkövektori, $dP \otimes dt$-melkein varmasti. 
+\end{enumerate}
+
+Olkoon nyt $\bar{\pi} = (\pi^0_t,\pi^1_t,\dots,\pi^n_t)_{t\leq T}$ pienen sijoittajan\footnote{Pienellä sijoittajalla tarkoitamme sijoittajaa, jonka strategia ei vaikuta markkinoiden hitnatasoon. Yleisesti oletamme, että markkinoilla ei ole tämänkaltaista sijoittajaa \cite{Jinma}.} portfolio\footnote{Portfoliota kutsutaan myös \emph{strategiaksi}, esimerkiksi \cite{Princeton} vastaan \cite{Elkaroui}.}, missä prosessi $\pi^0$ on sijoittajan joukkovelkakirjoihin sijoittama määrä, ja vastaavasti prosessi $\pi^i$ on osakkeeseen sijoitettu määrä. Edelleen, portfolion \emph{arvo} hetkellä $t$ määräytyy prosessista
+\begin{equation}\label{portfolio_arvo}
+V_t = V_t^{\bar{\pi}} := \sum_{m=0}^n \pi_t^m. 
+\end{equation}
+
+\begin{maar}\label{hyvaksyttava_itserahoittava_maar}
+Sanomme, että portfolio $\bar{\pi}$ on \emph{hyväksyttävä} (engl. admissible), jos prosessit $(\pi^0_t, \dots, \pi^n_t)$ ovat $\mathcal{P}_{n+1}$-mitallisia ja jos $P$-melkein varmasti pätee
+\begin{equation}
+\int_0^T |\pi_t^0|dt <\infty, \int_0^T |\pi_s^i\sigma_s^i|^2ds<\infty, V_t^{\bar{\pi}} \geq 0 
+\end{equation}
+kaikille $i\in[0,\infty)$ ja $t\leq T$.
+
+Lisäksi sanomme, että hyväksyttävä portfolio $\bar{\pi}$ on \emph{omavarainen} (engl. self-financing) jos sen arvolle $(V_t^{\bar{\pi}})_{t\leq T}$ pätee
+\begin{equation}\label{omavarainen}
+dV_t = \sum_{m=0}^n \pi_t^0 \frac{dP_t^0}{P_t^0} = r_tV_tdt + \sum_{i=0}^n (\pi_t^i(b_t^i-r_t)dt + \pi_t^i\sigma_t^idB_t) = r_t V_t dt + \pi_t(b_t-r_t)dt + \pi_t\sigma_tdB_t,
+\end{equation}
+missä $\pi = (\pi_t^1,\dots,\pi_t^n)$ on riskilliset instrumentit sisältävä portfolio.
+\end{maar}
+
+Jatkossa kutsumme hyväksyttävien ja omavaraisten portfolioiden kokoelmaa kokoelmaksi $\mathcal{A}$. Joskus käytämme notaatiota $(V,\pi)\in \mathcal{A}$, millä tarkoitamme että pari $(\pi^0,\pi)\in \mathcal{A}$ missä tietysti $\pi^0_t = V_t - \sum_{i=1}^n \pi_t^i$.
+
+Seuraavaksi, olkoon $V_T = \xi_T$ jonkin ei-negatiivisen \emph{ehdolliselle vaateen} (engl. contingent claim) \emph{arvo }hetkellä $T$. Jos vaateen \emph{lunastushinta} (engl. strike price) on $K$, arvo voi yksinkertaisimmillaan\footnote{Kyseessä on tavanomaisen eurooppalaisen option tuottama voitto.} olla $\xi_T = (P_T^1 - K)^+$, missä merkintä $(.)^+ = \max(0,.)$. Haluamme selvittää vaadittavan \emph{alkupääoman} (engl. initial endowment) $V_0$ määrän, jotta ajassa $T$ sijoittajalla olisi arvo $\xi_T$ jos hän sijoittaa omavaraisen strategian mukaan\footnote{Tällaista optiota kutsutaan eurooppalaiseksi osto-optioksi (engl. European call option) \cite{Sottinenrahis}}. Toisin sanoen
+\begin{equation}
+X_0 = \inf\{x |\text{ On olemassa pari } (V,\pi) \text{ siten, että } (V,\pi)\in\mathcal{A},V_T=\xi_T \text{ ja } V_0 = x \}.
+\end{equation} 
+
+Jos oletamme rahoitusmarkkinat \emph{arbitraasivapaiksi}\footnote{Engl. Arbitrage free market. Sanomme, että rahoitusmarkkinat eli yksinkertaistettu hinnoittelumalli $(r,\pi,\Omega, \mathcal{F}, P)$ on arbitraasivapaa jos ja vain jos sille on olemassa mitan $P$ kanssa ekvivalentti ja riskineutraali mitta $Q$. Lisää arbitraasivapauden osoittamisesta riskineutraalin mitan avulla esimerkiksi kirjassa \cite{Sottinenrahis}.} ja täydellisiksi, ehdollisen vaateen arvo $\xi_T = (P_T^1-K)^+$ saadaan erään lineaarisen TSDY:n ratkaisuna. Tämän osoittaa seuraava lause, joka ratkaistiin ensimmäistä kertaa lähteessä \cite{Elkaroui}.
+
+\begin{lause}
+Olkoon $n=d$, matriisi $\sigma_t = (\sigma^1_t,\dots,\sigma^n_t)$ kääntyvä ja riskipreemiovektori $\theta_t = (\sigma)^{-1}(b_t-r_t)$ rajoitettu. Nyt jokaiselle $0 \leq \xi_T\in L^2(\mathcal{F}_T)$, alkupääoma $X_0 = Y_0$, millä pari $(Y_t,\pi_t\sigma_t)$ on lineaarisen takaperäisen stokastisen differentiaaliyhtälön
+\begin{equation}\label{tsdy_rahis_1}
+\begin{cases}dY_t = (r_t Y_t + \pi_t\sigma_t \theta_t)dt + \pi_t \sigma_t dB_t \\ Y_T = \xi_T \end{cases},
+\end{equation}
+missä $Y_t$ on saman ehdollisen vaateen arvo hetkellä $t$ ja $\pi_t$ riskiä sisältävä portofolio, ratkaisu. Edelleen $Y$ on kaikkien hyväksyttävien portfolioiden pienin mahdollinen arvo, toisin sanoen jos pari $(V^{\pi}, \pi)$ on yhtälön \ref{omavarainen} ratkaisu jolle $(V^{\pi}, \pi)\in\mathcal{A}$, niin silloin kaikille $t\in[0,T]$ pätee $Y_T \leq V^{\pi}_t$ $P$-melkein varmasti. 
+\begin{proof}
+Takaperäisten stokastisten differentiaaliyhtälöiden ratkaisujen olemassaolo- ja yksikäsitteisyyslauseen \ref{tsdyolemassaolo} mukaan yhtälölle \ref{tsdy_rahis_1} on olemassa yksikäsitteinen ratkaisu $(Y,Z)$ generaattorilla $f_t(y,z) = -(r_t y + z\theta_t) = - r_t y - z\theta_t$. Koska lähtöarvo $\xi_T$ on positiivinen, lemman \ref{alkuarvopos_lemma} mukaan prosessi $Y_T$ on positiivinen ja on edelleen erään omavaraisen ja hyväksyttävän portfolion arvo. Nyt asetamme jokaiselle $t\leq T$ $\pi_t = Z_t\sigma_t^{-1}$. Tällöin $\int_0^T|\pi_s\sigma_s|^2ds < \infty $ ja pari $(Y,\pi\sigma)$ on yhtälön \ref{tsdy_rahis_1} ratkaisu. Teemme kuten lähteessä \cite{Princeton}: samoin kun lauseeen \ref{vertailulause} ratkaisun lopussa, otamme käyttöön \emph{hintatiheysprosessin} $\Gamma^{r,\theta}$, jolle pätee
+\begin{equation}
+d\Gamma_{t,s}^{r,\theta} = \Gamma_{t,s}^{r,\theta}(-r_s ds- \theta_s dB_s)
+\end{equation}
+ja $\Gamma_{t,t}^{r,\theta}=1$. Nyt prosessi $\Gamma_{0,t}^{r,\theta} Y_t$ on martingaali, ja edelleen lemman \ref{lbsde_tiheysprosessilla} mukaan ratkaisu on olemassa prosessin $\Gamma_{t,s}^{r,\theta}$ avulla.
+
+Olkoon $\tilde{\pi} = (\tilde{\pi}^0,\tilde{\pi})$ sellainen hyväksyttävä portfolio, jolle $V_T^{\tilde{\pi}}=\xi_T$. Koska myös prosessi $V_T^{\tilde{\pi}}$ on yhtälön \ref{omavarainen} ratkaisu, niin Itôn lemman mukaan $\Gamma_{0,t}^{r,\theta} Y_t$ on positiivinen ja paikallinen martingaali loppuarvolla $\Gamma_{0,t}^{r,\theta} \xi_T = \Gamma_{0,t}^{r,\theta} Y_t$. Koska jokainen positiivinen ja lokaali martingaali on supermartingaali, jokaisella ajanhetkellä $t$ pätee
+\begin{equation}
+\Gamma_{0,t}^{r,\theta} V_t^{\tilde{\pi}} \geq E(\Gamma_{0,t}^{r,\theta} \xi_T | \mathcal{F}_t) =\Gamma_{0,t}^{r,\theta} Y_t
+\end{equation}
+ja $Y_t$ on siten ehdollisen vaateen $\xi_T$ hinta hetkellä $t$.
+\end{proof}
+\end{lause}
+
+Huomautamme, että matemaattisen rahoitusteorian mielessä prosessi $\Gamma$ voidaan jakaa kahteen osaan $\Gamma = D \times \tilde{L}$, missä $D_{t,s} = \exp\{-\int_s^t r_u du \}$ on niin kutsuttu \emph{diskonttausprosessi}, ja $L_{0,T}$ on riskineutraalin todennäköisyysmitan $Q$ uskottavuusfunktio. Näistä asioista ja markkinoiden tarkemmasta hintaprosessista lisää lähteessä \cite{Elkaroui}.
+ 
+Jatkamme nyt lauseen \ref{tsdy_rahis_1} tarkastelua tiheysprosessin $\Gamma$ ympärillä, jotta saamme suljetun muodon ehdollisen vaateen arvolle $Y_t$. Lemman \ref{lbsde_tiheysprosessilla} loppuosan mukaisesti voimme kirjoittaa hintatiheysprosessin muotoon
+\begin{equation}
+\Gamma_t = \exp\biggl\lbrace \int_0^t \big( -r_s - \frac{1}{2}\theta_s^2 \big) ds - \int_0^t \theta_s dB_s \biggr\rbrace.
+\end{equation}
+Edelleen lemman \ref{lbsde_tiheysprosessilla} mukaan saamme vaateen arvolle $Y_t$ muodon
+\begin{align}
+Y_t = \frac{1}{\Gamma_t}E_P(\Gamma_T \xi_T | \mathcal{F}_t)  & = E_P(\frac{\Gamma_T}{\Gamma_t} \xi_T | \mathcal{F}_t) \nonumber \\ &= E_P(\exp\{(-r-\frac{1}{2}\theta_t^2)(T-t)-\theta(B_T-B_t)\}\xi_T|\mathcal{F}_t),
+\end{align}
+missä saimme hintatiheysprosessin odotusarvon sisään sillä $\Gamma_t$ on $\mathcal{F}_t$-adaptoitunut. Määrittelemme nyt riskineutraalin mitan $Q$ siten, että 
+\begin{equation}
+\frac{dQ}{dP}\bigg\vert_{\mathcal{F}_T} := \mathcal{E}\biggl( -\int_0^T \theta_s dB_s \biggr) = \exp\biggl\lbrace -\frac{1}{2}\int_0^T \theta_s^2 ds - \int_0^T \theta_s dB_s\biggr\rbrace,
+\end{equation}
+ja edelleen, koska $\mathcal{E}(-\int_0^t \theta_s dB_s)$ on \emph{geometrinen Brownin liike}\footnote{Geometrinen Brownin liike on sellainen stokastinen prosessi, jonka muutoksen logaritmi noudattaa driftillistä Brownin liikettö. Aiheeseen voi tutustua tarkemmin esimerkiksi lähteestä \cite{Oksendal}.} ja siten martingaali, niin
+\begin{equation}
+E\biggl( \frac{dQ}{dP} \bigg\vert \mathcal{F}_t \biggr) = \mathcal{E}\biggl( -\int_0^t \theta_s dB_s \biggr) = \exp\biggl\lbrace -\theta_t B_t - \frac{1}{2}\theta^2_t t\biggr\rbrace.
+\end{equation}
+
+Lopuksi huomaamme, että Bayesin kaavan mukaan pätee 
+\begin{equation}
+Y_t = E_Q\big( \exp\{-r_t(T-t)\}\xi_T|\mathcal{F}_t\big).
+\end{equation}
+
+Koska voitto $\xi_T$ maturiteettihetkellä $t$ on diskonttaamaton prosessi, niin huomaamme että ehdollisen vaateen arvo on riskineutraalin mitan $Q$ suhteen odotusarvoinen diskontattu voitto eli täsmälleen se arvo, minkä Black ja Scholes johtivat artikelissaan \cite{BlackScholes}.
+
+Tarkastelemme lopuksi tilannetta, missä saamme ratkaisuksi sellaisten TSDY:n, johon ei löydy analyyttistä ratkaisua. Tässä markkinamallissa on positiivinen \emph{myynti- ja ostokurssin erotus}\footnote{Rahoitusalalla on usein käytössä anglismi ''bid-ask -spread''.}, eli sijoittaja ottaa korkoa hinnalla $R_t$ ja lainaa sitä edelleen hinnalla $r_t \leq R_t$ kaikilla $t\leq T$. Rationaalisessa sijoittajakäytöksessä tämä redusoituu siihen, että jos $Y_t > \sum_{i=1}^d \pi^i_t$, niin sijoitamme velkakirjaan korolla $r_t$ ja edelleen lainaamme rahaa korolla $R_t$, jos $Y_t \leq \sum_{i=1}^d \pi^i_t$. Tällaisen omavaraisen strategian arvonmuutos saadaan yhtälöstä
+\begin{align}\label{numeerisesti}
+dY_t & = \sum_{i=1}^d \pi_t^i \frac{dV_T^i}{V_t^i}+ \biggl( Y_t - \sum_{i=1}^d \pi_t^i \biggr)^+ r_t dt - \biggl(Y_t-\sum_{i=1}^d \pi_t^i \biggr)^- R_t dt \nonumber \\
+&= \pi_t(\sigma_tdB_t + b_tdt) + (Y_t - \pi_t \mathbf{1})r_t dt - (R_t-r_t)(Y_t-\pi_t \mathbf{1})^-\nonumber \\
+&= r_tY_t dt + \pi_t\sigma_t\theta^r_t dt + \pi_t\sigma_rdB_t - (R_t-r_t)(Y_t-\pi\mathbf{1})^- dt,
+\end{align}
+missä alimman yhtälön viimeinen termi $(R_t-r_t)(Y_t-\pi\mathbf{1})^- dt$ kuvaa ylimääräistä hintaa lainalle. Nähdään, että yhtälön \ref{numeerisesti} generaattori on yhä Lipschitz-jatkuva, mutta ei enää lineaarinen. Lopetamme tämän tutkielman inspiroivaan ajatukseen siitä, että nyt perustavanlaatuisen analyyttisen otteen jälkeen seuraava luonnollinen suunta TSDY:iden teorian ja käytettävyyden kehittämiseksi olisi kulkea esimerkiksi numeerisen ratkaisukeinon suuntaan. Tällaisessa tapauksessa mielenkiinto voi erityisesti kohdistua sellaiseen takaperäiseen stokastiseen differentiaaliyhtälöön, jolla on generaattori kuten yhtälössä \ref{numeerisesti}. 
+
+
+\begin{thebibliography}{9}
+
+\bibitem{Anders1}
+Anders, Hald:  A History of Mathematical Statistics from 1750 to 1930, Wiley, 1998.
+
+\bibitem{Anders2}
+Anders, Hald: A History of Probability and Statistics and Their Applications before 1750, Wiley, 2003. 
+
+\bibitem{Armstrong}
+Armstrong, M.A: Basic Topology - Undergraduate Texts in Mathematics, Springer, 1983.
+
+\bibitem{Bauer}
+Bauer, Heinz: Probability Theory, 1.\ painos, Walter de Gruyter, 1996.
+
+\bibitem{Bismut}
+Bismut, Jean-Michel: Conjugate Convex Functions in Optimal Stochastic Control, Journal of Mathematical Analysis and Applications 44, sivut 384-404, 1973.
+
+\bibitem{BlackScholes}
+Black, Fisher; Scholes, Myron: The Pricing of Options and Corporate Liabilities, The Journal of Political Economy, Vol. 81, No. 3 (toukokuu - kesäkuu, 1973), sivut 637-654, The University of Chicago Press.
+
+\bibitem{Chung}
+Chung, K.L; Williams, R.J: Introduction to Stochastic Integration, 2.\ painos, Springer, 2014.
+
+\bibitem{Conway}
+Conway, J: A course in Functional Analysis, Springer, 3.\ painos, 1990.
+
+\bibitem{Dellacherie}
+Dellacherie, C; Meyer P.A: Probabilités et Potentiel, Hermann, Paris, 1975.
+
+\bibitem{Durrett}\label{durrett}
+Durrett, Rick: Probability: Theory and Examples, 4.\ painos, Cambridge, 2010.
+
+\bibitem{Einstein}
+Einstein, Albert: Über einen die Erzeugung und Verwandlung des Lichtes betreffenden heuristischen Gesichtspunkt, Annalen der Physik, Vol. 17, kappale 6, sivut 132-148. Kopio päiväyksellä 15.1.2017 osoitteesta http://www.zbp.univie.ac.at/dokumente/einstein1.pdf.
+
+\bibitem{Feynman}
+Feynman, R: The Brownian Movement, The Feynman Lectures of Physics, Volume I, 1964,sivut 41-51.
+
+\bibitem{Follmer}
+Föllmer, Hans; Schied, Alexander: Stochastic Finance -- An Introduction in Discrete Time, 3.\ painos, De Gruyter, 2010.
+
+\bibitem{Friz}
+Friz, Peter; Victoir, Nicolas: The Burkholder-Davis-Gundy Inequality for Enhanced Martingales, 2.2.2008,        arXiv:math/0608783.
+
+\bibitem{Gasbarra}
+Gasbarra, Dario: Introduction to Stochastic Analysis, Spring 2017, luentomoniste (Helsinging yliopisto, stokastinen analyysi).
+
+\bibitem{koskenoja}
+Harjulehto, Petteri; Klén, Riku; Koskenoja, Mika: Analyysiä reaaliluvuilla, 4.\ painos, Harjulehto-Klén-Koskenoja, 2017.
+
+\bibitem{Ito}
+Itô, Kiyosi. Stochastic integral. Proc. Imp. Acad. 20 (1944), no. 8, 519--524. doi:10.3792/pia/1195572786. https://projecteuclid.org/euclid.pja/1195572786
+
+\bibitem{Kaipio}
+Kaipio, Jari P.;Somersalo, Erkki: Computational and Statistical Methods for Inverse
+
+\bibitem{Princeton}
+Karoui, N. El; Hamadéne, Said; Matoussi, Anis: Backward Stochastic Differential Equations and Applications, 2008. http://archive.schools.cimpa.info/anciensite/NotesCours/PDF/2007/Maroc/Elkaroui-risk-BSDE.pdf.
+
+\bibitem{Elkaroui}
+Karoui, N. El; Peng, S; Quenez, M.C: Backward Stochastic Differential Equations in Finance. Mathematical Finance Vol. 07, No. 1 (Tammikuu 1997), sivut 1-71. 
+
+\bibitem{Andrei}
+Khrennikov, Andrei: Interpretations of Probability, de Gruyter, 2. painos, 2009.
+
+\bibitem{leibniz}
+Leibniz, Gottfried: New Essays on Human Undesrstanding (IV), Standard Encyclopedia of Philosophy, 1613.
+
+\bibitem{Lepertier}
+Lepertier, J.-P; San Martin, J: Backward Stochastic Differential Equations with Continuous Coefficient, Statistical Probability Letter, 1997, Vol. 32, sivut 425-430.
+
+\bibitem{ito-obituary}
+Lohr, Steve (November 23, 2008), "Kiyosi Ito, 93, Mathematician Who Described Random Motion, Dies", NY Times, luettu 05.11.2017.
+
+\bibitem{Jinma}
+Ma, Jin; Yong, Jiongmin: Forward-Backward Stochastic Differential Equations and Their Applications, 2.\ painos, Springer, 1999.
+
+\bibitem{Martio}
+Martio, Olli: Vektorianalyysi, 2.\ painos, Limes ry, 2008.
+
+\bibitem{Oksendal}
+Øksendal, Bernt: Stochastic Differential Equations -- An Introduction with Applications, 5.\ painos, Springer-Verlag, 1998.
+
+\bibitem{PardouxPeng}
+Pardoux, E; Peng, S: Adapted solution of a backward stochastic differential equation, System and Control Letters 14, sivut 55-61, 1990.
+
+\bibitem{Pardoux}
+Pardoux, Etienne; R\v{a}\k{s}canu, Aurel: Stochastic Differential Equations, Backward SDEs, Partial Differential Equations, Springer, 2014.
+
+\bibitem{Pham}
+Pham, H: Contiuous-Time Stochastic control and optimization with financial applications, Springer, 1.\ painos, 2009.
+Problems, Springer, 1.4.2004.
+
+\bibitem{Sondermann}
+Sondermann, Dieter: Introduction to Stochastic Calculus for Finance -- A New Didactic Approach, Springer-Verlag, 2006.
+
+\bibitem{Sottinenrahis}
+Sottinen, Tommi: Rahoitusteoria, Luentomateriaali (Vaasan yliopisto), 2006-04-18.
+
+\bibitem{Sottinentnt}
+Sottinen, Tommi: Todennäköisyysteoria, Luentomateriaali (Vaasan yliopisto), 2006-12-01.
+
+\bibitem{negrates}
+Tokic, Damir: Negative interest rates: Causes and consequences, Journal of Asset Management, Kesäkuu 2017, Vol. 18, Issue 4, sivut 243-254.
+
+\bibitem{Tolonen}
+Tolonen, Topias: Bayesiläinen inversio ja Metropolis-Hastings --algoritmi röntgentomografiassa, kandidaatintutkielma (ohjannut Tapio Helin), Helsingin Yliopisto, 10.1.2017.
+
+\bibitem{Touzi}
+Touzi, Nizar: Optimal Stochastic Control, Stochastic Target Problems and Backward SDE, Springer, 2013.
+
+\bibitem{Tuominen}
+Tuominen, Pekka: Todennäköisyyslaskenta I, 5.\ painos, Limes ry, 2000.
+
+\bibitem{Williams}
+Williams, David: Probability with Martingales, Cambridge University Press, 2.\ painos, 1991.
+	
+
+\end{thebibliography}
+
+
+\end{document}

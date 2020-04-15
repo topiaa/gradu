@@ -1,0 +1,27 @@
+\select@language {finnish}
+\contentsline {chapter}{\numberline {1}Johdanto}{3}
+\contentsline {chapter}{\numberline {2}Todenn\"ak\"oisyysavaruuden konstruoinnista Brownin liikkeeseen}{6}
+\contentsline {section}{\numberline {2.1}Todenn\"ak\"oisyysavaruuden m\"a\"arittely}{6}
+\contentsline {section}{\numberline {2.2}Katsaus odotusarvoon, Lebesgue-integraaleihin, niiden ominaisuuksiin ja raja-arvoihin}{8}
+\contentsline {subsection}{\numberline {2.2.1}L\textsuperscript {p}-avaruudet}{11}
+\contentsline {subsection}{\numberline {2.2.2}Satunnaismuuttujien raja-arvoista}{12}
+\contentsline {section}{\numberline {2.3}Ty\"okaluja stokastisten prosessien k\"asittelyyn}{13}
+\contentsline {subsection}{\numberline {2.3.1}Filtraatiot}{13}
+\contentsline {subsection}{\numberline {2.3.2}Ehdollinen odotusarvo ja johdanto stokastisiin prosesseihin}{14}
+\contentsline {subsection}{\numberline {2.3.3}Pys\"aytysaika ja martingaalit}{16}
+\contentsline {section}{\numberline {2.4}Brownin liike}{17}
+\contentsline {chapter}{\numberline {3}It\^o-analyysin alkeet ja stokastiset differentiaaliyht\"al\"ot}{22}
+\contentsline {section}{\numberline {3.1}It\^on perint\"o stokastisessa analyysiss\"a -- It\^on stokastiset integraalit ja It\^on lemma}{22}
+\contentsline {subsection}{\numberline {3.1.1}Neli\"oheilahtelu ja yksiulotteinen It\^o-integraali}{23}
+\contentsline {subsection}{\numberline {3.1.2}Kovariaatio ja moniulotteinen It\^on lemma}{27}
+\contentsline {subsection}{\numberline {3.1.3}Yleinen It\^o-integraali}{30}
+\contentsline {section}{\numberline {3.2}Stokastisten differentiaaliyht\"al\"oiden perusteet}{36}
+\contentsline {subsection}{\numberline {3.2.1}Olemassaolo- ja yksik\"asitteisyyslause sek\"a markoviaaninen ominaisuus}{37}
+\contentsline {chapter}{\numberline {4}Takaper\"aiset stokastiset differentiaaliyht\"al\"ot (TSDY:t)}{41}
+\contentsline {section}{\numberline {4.1}Yht\"al\"on m\"a\"aritelm\"a ja mielekkyys}{42}
+\contentsline {section}{\numberline {4.2}Nollageneraattori ja lineaarinen generaattori}{42}
+\contentsline {section}{\numberline {4.3}Ratkaisun olemassaolo ja yksik\"asitteisyys}{45}
+\contentsline {subsection}{\numberline {4.3.1}Ratkaisujen vertailu}{48}
+\contentsline {section}{\numberline {4.4}Generaattorit ilman Lipschitz-ominaisuutta}{52}
+\contentsline {chapter}{\numberline {5}Takaper\"aiset stokastiset differentiaaliyht\"al\"ot rahoitusteoriassa}{57}
+\contentsline {section}{\numberline {5.1}Rahoitusteorian perusk\"asitteit\"a ja eurooppalaisten optioiden hinnottelu TSDY:n viitekehyksess\"a}{57}
